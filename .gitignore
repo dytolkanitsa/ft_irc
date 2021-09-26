@@ -1,0 +1,4 @@
+*.o
+/cmake-build-debug
+ircserv
+.idea/
