@@ -3,7 +3,14 @@ project(ft_irc)
 
 set(CMAKE_CXX_STANDARD 11)
 
+include_directories(src/)
+
 add_executable(ft_irc
-        main.cpp)
-add_executable(test
+        main.cpp
+        src/Server.cpp)
+
+add_executable(showip
         showip.cpp)
+
+add_executable(test
+        test.cpp)
