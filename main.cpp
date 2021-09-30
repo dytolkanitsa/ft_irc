@@ -17,7 +17,7 @@ std::string * getArgs(const std::string& av){
 
 	for (int i = 0; i < 3; i++){
 		newPos = av.find(':', pos);
-		if (pos == std::string::npos)
+		if (newPos == std::string::npos && i != 2 || (i == 2 && newPos != std::string::npos))
 			return nullptr;
 		result[i] = av.substr(pos, newPos - pos);
 		pos = newPos + 1;
@@ -36,6 +36,7 @@ int main(int ac, char ** av){
 			return 1;
 		}
 		Server server(&res[0], av[1], av[2]); // todo: какие аргументы мы передаем?
+		// так как выделена память на первый аргумент и массив в принципе, надо не забыть ее освободить
 	} else
 	{
 		/*todo: args error*/
