@@ -4,6 +4,7 @@
 
 #include <netdb.h>
 #include <unistd.h>
+#include <cstring>
 #include "Server.hpp"
 
 Server::Server(const std::string *host, const std::string &port, const std::string &password)
