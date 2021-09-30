@@ -1,20 +1,63 @@
 //
 // Created by shaurmyashka on 9/19/21.
 //
+#include <cstring>
+
+#include "Server.hpp"
+
+/**
+ *separate the numbers of the first argument delimited ':'
+ * @param av first argument from main [host:port_network:password_network]
+ * @return allocated array of std::strings[3] or nullptr if av is wrong type
+ */
+std::string * getArgs(const std::string& av){
+	std::string *result = new std::string[3];
+	size_t pos = 0;
+	size_t newPos;
+
+	for (int i = 0; i < 3; i++){
+		newPos = av.find(':', pos);
+		if (pos == std::string::npos)
+			return nullptr;
+		result[i] = av.substr(pos, newPos - pos);
+		pos = newPos + 1;
+	}
+	return result;
+}
+
+int main(int ac, char ** av){
+	if (ac == 3){
+		Server server(nullptr, av[1], av[2]);
+
+	} else if (ac == 4){
+		std::string *res = getArgs(av[1]);
+		if (res == nullptr){
+			//todo: error first arg
+			return 1;
+		}
+		Server server(&res[0], av[1], av[2]); // todo: какие аргументы мы передаем?
+	} else
+	{
+		/*todo: args error*/
+	}
+}
+
+
+/*
+
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
+#include <iostream>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-
+#include <tgmath.h>
 #define PORT "9034"   // порт, который мы слушаем
 
-// получаем sockaddr, IPv4 или IPv6:
-void *get_in_addr(struct sockaddr *sa)
+  void *get_in_addr(struct sockaddr *sa)
 {
 	if (sa->sa_family == AF_INET) {
 		return &(((struct sockaddr_in*)sa)->sin_addr);
@@ -153,3 +196,4 @@ int main()
 
 	return 0;
 }
+*/
