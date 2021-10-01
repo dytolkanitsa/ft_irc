@@ -7,7 +7,8 @@ include_directories(src/)
 
 add_executable(ft_irc
         main.cpp
-        src/Server.cpp)
+        src/Server.cpp
+        src/User.cpp)
 
 add_executable(showip
         showip.cpp)

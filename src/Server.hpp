@@ -22,6 +22,7 @@ public:
 	void start();
 //	void stop();
 	virtual ~Server();
+	void acceptProcess();
 
 };
 

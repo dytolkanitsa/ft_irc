@@ -82,10 +82,50 @@ void Server::start() {
 			//todo: poll error
 		}
 	///после этого нужно что-то сделать с тем, что нам пришло после poll
+//		this->acceptProcess();
+	///пока закоментированно, но предположительно будет вызываться вот этот метод
 	}
 }
 
 Server::~Server() {
+
+}
+
+void Server::acceptProcess() {
+	std::vector<pollfd>::iterator itFds;
+	pollfd nowPollfd;
+
+for (itFds = fds.begin(); itFds != fds.end(); itFds++){
+
+	nowPollfd = *itFds;
+
+	if ((nowPollfd.revents & POLLIN) == POLLIN){ ///модно считать данныке
+
+		if (nowPollfd.fd == socketFd){ ///accept
+
+			int clientSocket;
+			sockaddr_in		clientAddr;
+			socklen_t socketLen = sizeof (clientAddr);
+
+			clientSocket = accept(socketFd, (sockaddr *) &clientAddr, &socketLen);
+			if (clientSocket == -1){
+				//todo: error accept
+			}
+
+			pollfd clientPollfd {clientSocket, POLLIN, 0};
+			fds.push_back(clientPollfd);
+
+			if (fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1){
+				//todo: fcntl error
+			}
+
+		} else{ ///нужно принять данные не с основного сокета, который мы слушаем(клиентского?)
+		}
+	}
+	else if ((nowPollfd.revents & POLLHUP) == POLLHUP){ ///кто-то оборвал соединение
+	}
+}
+
 
 }
 
