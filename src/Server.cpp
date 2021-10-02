@@ -6,7 +6,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <cstring>
+#include <arpa/inet.h>
+
 #include "Server.hpp"
+//#include "User.hpp"
 
 Server::Server(const std::string *host, const std::string &port, const std::string &password)
 : host(host), port(port), password(password), socketFd(-1) {
@@ -65,8 +68,8 @@ void Server::init() {
  * listen сокета, создание pollfd структуры для этого сокета,
  * добавление в вектор структур, и главный цикл
  */
-_Noreturn
-void Server::start() {
+//_Noreturn
+[[noreturn]] void Server::start() {
 	if (listen(this->socketFd, 10) == -1){//todo: 10 - очередь из соединений
 		//todo: listen error
 	}
@@ -82,7 +85,7 @@ void Server::start() {
 			//todo: poll error
 		}
 	///после этого нужно что-то сделать с тем, что нам пришло после poll
-//		this->acceptProcess();
+		this->acceptProcess();
 	///пока закоментированно, но предположительно будет вызываться вот этот метод
 	}
 }
@@ -117,9 +120,22 @@ for (itFds = fds.begin(); itFds != fds.end(); itFds++){
 
 			if (fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1){
 				//todo: fcntl error
+
+				//нужно создать пользователя
+				User *user = new User(clientSocket, inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port));
+				//а теперь добавиьт его в "массив" пользователей в сервере
+				users.push_back(user);
 			}
 
 		} else{ ///нужно принять данные не с основного сокета, который мы слушаем(клиентского?)
+
+			std::vector<User *>::iterator	itUser = users.begin();
+//			std::advance(itUser, std::distance(fds.begin(), itFds) - 1);
+//			itUser->getSocketFd();
+			recvMessage(*itUser);
+
+
+
 		}
 	}
 	else if ((nowPollfd.revents & POLLHUP) == POLLHUP){ ///кто-то оборвал соединение
@@ -127,6 +143,29 @@ for (itFds = fds.begin(); itFds != fds.end(); itFds++){
 }
 
 
+}
+
+void Server::recvMessage(User *user) {
+	char message[100]; /*todo: 100?*/
+	ssize_t recvByte;
+	memset(message, '\0', sizeof(message));
+	recvByte = recv(user->getSocketFd(), message, sizeof(message), 0);
+	if (recvByte <= 0){
+		//todo: error;
+	}
+	user->setMessage(message);
+}
+
+void Server::sendMessage(User *user) {
+	std::vector<User *>::iterator	itUser = users.begin();
+	for (itUser = users.begin(); itUser != users.end(); itUser++){
+		if (*itUser == user){
+			//не отправляем сообщение
+		} else {
+			send(user->getSocketFd(), user->getMessage().c_str(), user->getMessage().length(), 0);
+			//отправляем
+		}
+	}
 }
 
 

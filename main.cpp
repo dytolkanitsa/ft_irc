@@ -35,7 +35,10 @@ int main(int ac, char ** av){
 			//todo: error first arg
 			return 1;
 		}
-		Server server(&res[0], av[1], av[2]); // todo: какие аргументы мы передаем?
+//		std::string * port
+		Server server(&res[0], av[2], av[3]); // todo: какие аргументы мы передаем?
+		server.init();
+		server.start();
 		// так как выделена память на первый аргумент и массив в принципе, надо не забыть ее освободить
 	} else
 	{

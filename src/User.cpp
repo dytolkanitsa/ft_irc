@@ -11,3 +11,15 @@ User::User(int socketFd, char *host, int port) : socketFd(socketFd), host(host),
 User::~User() {
 
 }
+
+int User::getSocketFd() {
+	return socketFd;
+}
+
+void User::setMessage(std::string newMessage) {
+	this->message = newMessage;
+}
+
+std::string User::getMessage() {
+	return message;
+}

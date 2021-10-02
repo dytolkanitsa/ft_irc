@@ -8,6 +8,7 @@
 #include <string>
 #include <sys/poll.h>
 #include <vector>
+#include "User.hpp"
 
 class Server {
 private:
@@ -16,13 +17,18 @@ private:
 	const std::string & port;
 	const std::string & password;
 	std::vector<pollfd> fds;
+	std::vector<User *> users;
+
 public:
 	Server(const std::string * host, const std::string & port, const std::string & password);
 	void init();
-	void start();
+
+	[[noreturn]] void start();
 //	void stop();
 	virtual ~Server();
 	void acceptProcess();
+	void recvMessage(User * user);
+	void sendMessage(User * user);
 
 };
 
