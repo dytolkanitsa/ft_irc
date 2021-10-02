@@ -42,6 +42,7 @@ int main(int ac, char ** av){
 		// так как выделена память на первый аргумент и массив в принципе, надо не забыть ее освободить
 	} else
 	{
+		std::cout << "./ircserv [host:port_network:password_network] <port> <password>\n";
 		/*todo: args error*/
 	}
 }

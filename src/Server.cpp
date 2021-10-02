@@ -98,49 +98,43 @@ void Server::acceptProcess() {
 	std::vector<pollfd>::iterator itFds;
 	pollfd nowPollfd;
 
-for (itFds = fds.begin(); itFds != fds.end(); itFds++){
+	for (itFds = fds.begin(); itFds != fds.end(); itFds++) {
 
-	nowPollfd = *itFds;
+		nowPollfd = *itFds;
 
-	if ((nowPollfd.revents & POLLIN) == POLLIN){ ///модно считать данныке
+		if ((nowPollfd.revents & POLLIN) == POLLIN){ ///модно считать данные
 
-		if (nowPollfd.fd == socketFd){ ///accept
+			if (nowPollfd.fd == socketFd) { ///accept
+				std::cout << "🤔" << std::endl;
+				int clientSocket;
+				sockaddr_in		clientAddr;
+				socklen_t socketLen = sizeof (clientAddr);
 
-			int clientSocket;
-			sockaddr_in		clientAddr;
-			socklen_t socketLen = sizeof (clientAddr);
+				clientSocket = accept(socketFd, (sockaddr *) &clientAddr, &socketLen);
+				if (clientSocket == -1){
+					//todo: error accept
+				}
 
-			clientSocket = accept(socketFd, (sockaddr *) &clientAddr, &socketLen);
-			if (clientSocket == -1){
-				//todo: error accept
+				pollfd clientPollfd {clientSocket, POLLIN, 0};
+				fds.push_back(clientPollfd);
+
+				if (fcntl(clientSocket, F_SETFL, O_NONBLOCK) != -1) {
+					//todo: fcntl error
+				}
+					//нужно создать пользователя
+					User *user = new User(clientSocket, inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port));
+					//а теперь добавиьт его в "массив" пользователей в сервере
+					users.push_back(user);
+			} else { ///нужно принять данные не с основного сокета, который мы слушаем(клиентского?)
+				std::vector<User *>::iterator	itUser = users.begin();
+//				std::advance(itUser, std::distance(fds.begin(), itFds) - 1);
+//				itUser->getSocketFd();
+				recvMessage(*itUser);
 			}
-
-			pollfd clientPollfd {clientSocket, POLLIN, 0};
-			fds.push_back(clientPollfd);
-
-			if (fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1){
-				//todo: fcntl error
-
-				//нужно создать пользователя
-				User *user = new User(clientSocket, inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port));
-				//а теперь добавиьт его в "массив" пользователей в сервере
-				users.push_back(user);
-			}
-
-		} else{ ///нужно принять данные не с основного сокета, который мы слушаем(клиентского?)
-
-			std::vector<User *>::iterator	itUser = users.begin();
-//			std::advance(itUser, std::distance(fds.begin(), itFds) - 1);
-//			itUser->getSocketFd();
-			recvMessage(*itUser);
-
-
-
+		}
+		else if ((nowPollfd.revents & POLLHUP) == POLLHUP){ ///кто-то оборвал соединение
 		}
 	}
-	else if ((nowPollfd.revents & POLLHUP) == POLLHUP){ ///кто-то оборвал соединение
-	}
-}
 
 
 }
