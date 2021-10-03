@@ -12,7 +12,7 @@
 //#include "User.hpp"
 
 Server::Server(const std::string *host, const std::string &port, const std::string &password)
-: host(host), port(port), password(password), socketFd(-1) {
+: host(nullptr), port(port), password(password), socketFd(-1) {
 
 }
 
@@ -30,7 +30,7 @@ void Server::init() {
 	hints.ai_socktype = SOCK_STREAM; // TCP stream-sockets
 	hints.ai_flags = AI_PASSIVE;     // заполните мой IP-адрес за меня
 
-	if ((status = getaddrinfo(this->host->c_str(), this->port.c_str(), &hints, &serverInfo)) != 0) {
+	if ((status = getaddrinfo(this->host ? this->host->c_str() : nullptr, this->port.c_str(), &hints, &serverInfo)) != 0) {
 		// TODO: errors
 	}
 
@@ -98,9 +98,8 @@ void Server::acceptProcess() {
 	std::vector<pollfd>::iterator itFds;
 	pollfd nowPollfd;
 
-	for (itFds = fds.begin(); itFds != fds.end(); itFds++) {
-
-		nowPollfd = *itFds;
+	for (int i = 0; i < this->fds.size(); i++) {
+		nowPollfd = this->fds[i];
 
 		if ((nowPollfd.revents & POLLIN) == POLLIN){ ///модно считать данные
 
@@ -108,35 +107,61 @@ void Server::acceptProcess() {
 				std::cout << "🤔" << std::endl;
 				int clientSocket;
 				sockaddr_in		clientAddr;
+				memset( &clientAddr, 0, sizeof(clientAddr));
 				socklen_t socketLen = sizeof (clientAddr);
 
 				clientSocket = accept(socketFd, (sockaddr *) &clientAddr, &socketLen);
-				if (clientSocket == -1){
+				if (clientSocket == -1) {
 					//todo: error accept
+					continue;
+					std::cout << strerror(errno) << std::endl;
+					std::cout << strerror(EAGAIN) << std::endl;
+					std::cout << strerror(EWOULDBLOCK) << std::endl;
+					std::cout << strerror(EBADF) << std::endl;
+					std::cout << strerror(ECONNABORTED) << std::endl;
+					std::cout << strerror(EFAULT) << std::endl;
+					std::cout << strerror(EINTR) << std::endl;
+					std::cout << strerror(EINVAL) << std::endl;
+					std::cout << strerror(EMFILE) << std::endl;
+					std::cout << strerror(ENOBUFS) << std::endl;
+					std::cout << strerror(ENOMEM) << std::endl;
+					std::cout << strerror(ENOTSOCK) << std::endl;
+					std::cout << strerror(EOPNOTSUPP) << std::endl;
+					std::cout << strerror(EPERM) << std::endl;
+					std::cout << strerror(EPROTO) << std::endl;
+					exit(1);
 				}
 
 				pollfd clientPollfd {clientSocket, POLLIN, 0};
 				fds.push_back(clientPollfd);
 
-				if (fcntl(clientSocket, F_SETFL, O_NONBLOCK) != -1) {
+				if (fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1) {
 					//todo: fcntl error
+					throw std::runtime_error("fcntl error");
 				}
+					std::cout<< "cs:" << clientSocket << std::endl;
+					std::cout<< "sfd:" << this->socketFd << std::endl;
 					//нужно создать пользователя
 					User *user = new User(clientSocket, inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port));
-					//а теперь добавиьт его в "массив" пользователей в сервере
+					//а теперь добавить его в "массив" пользователей в сервере
 					users.push_back(user);
-			} else { ///нужно принять данные не с основного сокета, который мы слушаем(клиентского?)
-				std::vector<User *>::iterator	itUser = users.begin();
-//				std::advance(itUser, std::distance(fds.begin(), itFds) - 1);
-//				itUser->getSocketFd();
-				recvMessage(*itUser);
+//					break;
+			}
+			else { ///нужно принять данные не с основного сокета, который мы слушаем(клиентского?)
+				try {
+					std::cout << "fd: " << nowPollfd.fd << std::endl;
+//					std::vector<User *>::iterator	itUser = users.begin();
+//					std::advance(itUser, std::distance(fds.begin(), itFds) - 1);
+					//				itUser->getSocketFd();
+					recvMessage(this->users[i ? i - 1 : 0]);
+				} catch (std::runtime_error & e) {
+					std::cout << e.what() << std::endl;
+				}
 			}
 		}
 		else if ((nowPollfd.revents & POLLHUP) == POLLHUP){ ///кто-то оборвал соединение
 		}
 	}
-
-
 }
 
 void Server::recvMessage(User *user) {
@@ -146,8 +171,11 @@ void Server::recvMessage(User *user) {
 	recvByte = recv(user->getSocketFd(), message, sizeof(message), 0);
 	if (recvByte <= 0){
 		//todo: error;
+//		throw std::runtime_error("recv < 0");
+		return;
 	}
 	user->setMessage(message);
+	std::cout << "💬 ➡ " << message << " ⬅ 🐢" << std::endl;
 }
 
 void Server::sendMessage(User *user) {
