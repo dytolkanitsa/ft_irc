@@ -154,6 +154,7 @@ void Server::acceptProcess() {
 //					std::advance(itUser, std::distance(fds.begin(), itFds) - 1);
 					//				itUser->getSocketFd();
 					recvMessage(this->users[i ? i - 1 : 0]);
+					sendMessage(this->users[i ? i - 1 : 0]);
 				} catch (std::runtime_error & e) {
 					std::cout << e.what() << std::endl;
 				}
@@ -174,18 +175,22 @@ void Server::recvMessage(User *user) {
 //		throw std::runtime_error("recv < 0");
 		return;
 	}
+	message[strlen(message) + 1] = '\r';
+	message[strlen(message) + 2] = '\n';
 	user->setMessage(message);
 	std::cout << "💬 ➡ " << message << " ⬅ 🐢" << std::endl;
 }
 
 void Server::sendMessage(User *user) {
 	std::vector<User *>::iterator	itUser = users.begin();
+	User *curUser;
 	for (itUser = users.begin(); itUser != users.end(); itUser++){
-		if (*itUser == user){
-			//не отправляем сообщение
-		} else {
-			send(user->getSocketFd(), user->getMessage().c_str(), user->getMessage().length(), 0);
-			//отправляем
+		curUser = *itUser;
+		/*if (*itUser == user){
+			не отправляем сообщение
+		} else */if (curUser != user){
+			send(curUser->getSocketFd(), user->getMessage().c_str(), user->getMessage().length(), 0);
+//			отправляем
 		}
 	}
 }
