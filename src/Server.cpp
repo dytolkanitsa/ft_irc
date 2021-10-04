@@ -58,6 +58,7 @@ void Server::init() {
 	}
 	if (rp == nullptr)  {
 //		fprintf(stderr, "server: failed to bind");
+		exit(1);
 		// todo: bind error
 //		return 2;
 	}
@@ -71,17 +72,20 @@ void Server::init() {
 //_Noreturn
 [[noreturn]] void Server::start() {
 	if (listen(this->socketFd, 10) == -1){//todo: 10 - очередь из соединений
+		exit(1);
 		//todo: listen error
 	}
-	pollfd sPollfd {socketFd, POLLIN, 0};
-	if (fcntl(socketFd, F_SETFL, O_NONBLOCK) == -1){
+	pollfd sPollfd {this->socketFd, POLLIN, 0};
+	if (fcntl(this->socketFd, F_SETFL, O_NONBLOCK) == -1){
+		exit(1);
 		//todo: fcntl error
 	}
-	fds.push_back(sPollfd);
+	this->fds.push_back(sPollfd);
 	std::vector<pollfd>::iterator	it;
 	while(true){
-		it = fds.begin();
-		if (poll(&(*it), fds.size(), -1) == -1){
+		it = this->fds.begin();
+		if (poll(&(*it), this->fds.size(), -1) == -1){
+			exit(1);
 			//todo: poll error
 		}
 	///после этого нужно что-то сделать с тем, что нам пришло после poll
@@ -103,18 +107,18 @@ void Server::acceptProcess() {
 
 		if ((nowPollfd.revents & POLLIN) == POLLIN){ ///модно считать данные
 
-			if (nowPollfd.fd == socketFd) { ///accept
+			if (nowPollfd.fd == this->socketFd) { ///accept
 				std::cout << "🤔" << std::endl;
 				int clientSocket;
 				sockaddr_in		clientAddr;
 				memset( &clientAddr, 0, sizeof(clientAddr));
 				socklen_t socketLen = sizeof (clientAddr);
 
-				clientSocket = accept(socketFd, (sockaddr *) &clientAddr, &socketLen);
+				clientSocket = accept(this->socketFd, (sockaddr *) &clientAddr, &socketLen);
 				if (clientSocket == -1) {
 					//todo: error accept
 					continue;
-					std::cout << strerror(errno) << std::endl;
+					/*std::cout << strerror(errno) << std::endl;
 					std::cout << strerror(EAGAIN) << std::endl;
 					std::cout << strerror(EWOULDBLOCK) << std::endl;
 					std::cout << strerror(EBADF) << std::endl;
@@ -129,11 +133,11 @@ void Server::acceptProcess() {
 					std::cout << strerror(EOPNOTSUPP) << std::endl;
 					std::cout << strerror(EPERM) << std::endl;
 					std::cout << strerror(EPROTO) << std::endl;
-					exit(1);
+					exit(1);*/
 				}
 
 				pollfd clientPollfd {clientSocket, POLLIN, 0};
-				fds.push_back(clientPollfd);
+				this->fds.push_back(clientPollfd);
 
 				if (fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1) {
 					//todo: fcntl error
@@ -144,7 +148,7 @@ void Server::acceptProcess() {
 					//нужно создать пользователя
 					User *user = new User(clientSocket, inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port));
 					//а теперь добавить его в "массив" пользователей в сервере
-					users.push_back(user);
+					this->users.push_back(user);
 //					break;
 			}
 			else { ///нужно принять данные не с основного сокета, который мы слушаем(клиентского?)
@@ -165,6 +169,10 @@ void Server::acceptProcess() {
 	}
 }
 
+/**
+ * функция для получения сообщения и добавления к нему "\r\n"
+ * @param user класс пользователя для получения сообщения
+ */
 void Server::recvMessage(User *user) {
 	char message[100]; /*todo: 100?*/
 	ssize_t recvByte;
@@ -181,8 +189,12 @@ void Server::recvMessage(User *user) {
 	std::cout << "💬 ➡ " << message << " ⬅ 🐢" << std::endl;
 }
 
+/**
+ * функция(временная) для отправки сообщения всем пользователям, кроме него самого
+ * @param user класс пользователя, который отправляет сообщение
+ */
 void Server::sendMessage(User *user) {
-	std::vector<User *>::iterator	itUser = users.begin();
+	std::vector<User *>::iterator	itUser;
 	User *curUser;
 	for (itUser = users.begin(); itUser != users.end(); itUser++){
 		curUser = *itUser;
@@ -194,8 +206,3 @@ void Server::sendMessage(User *user) {
 		}
 	}
 }
-
-
-
-
-
