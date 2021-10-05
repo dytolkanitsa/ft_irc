@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <cstring>
+#include <array>
 #include <arpa/inet.h>
 
 #include "Server.hpp"
@@ -90,7 +91,6 @@ void Server::init() {
 		}
 	///после этого нужно что-то сделать с тем, что нам пришло после poll
 		this->acceptProcess();
-	///пока закоментированно, но предположительно будет вызываться вот этот метод
 	}
 }
 
@@ -99,7 +99,7 @@ Server::~Server() {
 }
 
 void Server::acceptProcess() {
-	std::vector<pollfd>::iterator itFds;
+//	std::vector<pollfd>::iterator itFds;
 	pollfd nowPollfd;
 
 	for (int i = 0; i < this->fds.size(); i++) {
@@ -190,12 +190,40 @@ void Server::recvMessage(User *user) {
 }
 
 /**
+ * разделяет строку по пробелам
+ * @param argString строка-сообщение
+ * @return std::array содержащий аргументы
+ */
+std::array<std::string, 6>getArgs(std::string argString){
+	std::array<std::string, 6> args;
+	size_t pos = 0;
+	size_t newPos;
+
+	for (int i = 0; i < 6; i++){
+		newPos = argString.find(' ', pos);
+		if (newPos == std::string::npos)
+		{
+			args[i] = argString.substr(pos, newPos - pos);
+			return args;
+		}
+		args[i] = argString.substr(pos, newPos - pos);
+		pos = newPos + 1;
+	}
+	return args;
+
+}
+
+
+/**
  * функция(временная) для отправки сообщения всем пользователям, кроме него самого
  * @param user класс пользователя, который отправляет сообщение
  */
 void Server::sendMessage(User *user) {
 	std::vector<User *>::iterator	itUser;
 	User *curUser;
+	std::array<std::string, 6> args;
+
+	args = getArgs(user->getMessage());
 	for (itUser = users.begin(); itUser != users.end(); itUser++){
 		curUser = *itUser;
 		/*if (*itUser == user){
