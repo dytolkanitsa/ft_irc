@@ -9,6 +9,7 @@
 #include <sys/poll.h>
 #include <vector>
 #include "User.hpp"
+#include "Command.hpp"
 
 class Server {
 private:
@@ -18,6 +19,7 @@ private:
 	const std::string & password;
 	std::vector<pollfd> fds;
 	std::vector<User *> users;
+	std::vector<Command *> commands;
 
 public:
 	Server(const std::string * host, const std::string & port, const std::string & password);
@@ -29,6 +31,8 @@ public:
 	void acceptProcess();
 	void recvMessage(User * user);
 	void sendMessage(User * user);
+	User *findUserByName(std::string userName);
+	Command *findCommandByName(std::string commandName);
 
 };
 

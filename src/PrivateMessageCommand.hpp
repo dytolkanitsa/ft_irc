@@ -10,8 +10,8 @@
 
 class PrivateMessageCommand : public Command{
 public:
-	PrivateMessageCommand();
-	void execute(User *user) override;
+	PrivateMessageCommand(std::vector<User *> &users);
+	void execute(User *receiver, User *sender) override;
 };
 
 

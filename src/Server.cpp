@@ -10,11 +10,15 @@
 #include <arpa/inet.h>
 
 #include "Server.hpp"
+#include "PrivateMessageCommand.hpp"
+#include "UserCommand.hpp"
 //#include "User.hpp"
 
 Server::Server(const std::string *host, const std::string &port, const std::string &password)
 : host(nullptr), port(port), password(password), socketFd(-1) {
-
+	commands.push_back(new PrivateMessageCommand(<#initializer#>, <#initializer#>));
+	commands.push_back(new UserCommand());
+	//todo: add commands
 }
 
 /**
@@ -189,29 +193,7 @@ void Server::recvMessage(User *user) {
 	std::cout << "💬 ➡ " << message << " ⬅ 🐢" << std::endl;
 }
 
-/**
- * разделяет строку по пробелам
- * @param argString строка-сообщение
- * @return std::array содержащий аргументы
- */
-std::array<std::string, 6>getArgs(std::string argString){
-	std::array<std::string, 6> args;
-	size_t pos = 0;
-	size_t newPos;
 
-	for (int i = 0; i < 6; i++){
-		newPos = argString.find(' ', pos);
-		if (newPos == std::string::npos)
-		{
-			args[i] = argString.substr(pos, newPos - pos);
-			return args;
-		}
-		args[i] = argString.substr(pos, newPos - pos);
-		pos = newPos + 1;
-	}
-	return args;
-
-}
 
 
 /**
@@ -219,18 +201,54 @@ std::array<std::string, 6>getArgs(std::string argString){
  * @param user класс пользователя, который отправляет сообщение
  */
 void Server::sendMessage(User *user) {
-	std::vector<User *>::iterator	itUser;
-	User *curUser;
-	std::array<std::string, 6> args;
+	std::string message = user->getMessage();
+	std::string command = message.substr(0,message.find(' '));
+	Command *curCommand;
+	curCommand = this->findCommandByName(command);
 
-	args = getArgs(user->getMessage());
-	for (itUser = users.begin(); itUser != users.end(); itUser++){
-		curUser = *itUser;
-		/*if (*itUser == user){
-			не отправляем сообщение
-		} else */if (curUser != user){
-			send(curUser->getSocketFd(), user->getMessage().c_str(), user->getMessage().length(), 0);
+//	std::vector<User *>::iterator	itUser;
+//	User *curUser;
+//
+//	for (itUser = users.begin(); itUser != users.end(); itUser++){
+//		curUser = *itUser;
+//		/*if (*itUser == user){
+//			не отправляем сообщение
+//		} else */if (curUser != user){
+//			send(curUser->getSocketFd(), user->getMessage().c_str(), user->getMessage().length(), 0);
 //			отправляем
+//		}
+//	}
+}
+
+/**
+ * пытается найти пользователя с переданным ему именем(пожелаем ему удачи!)
+ * @param userName имя предполагаемого пользователя, котрого нужно найти
+ * @return указатель на пользователя с необходимым именем или nullptr
+ */
+User *Server::findUserByName(std::string userName) { //перейдет в класс команды
+	std::vector<User *>::iterator it; // итератор по юзерам
+	for(it = this->users.begin(); it != this->users.end(); it++){
+		User *curUser = *it;
+		if (curUser->getName() == userName){
+			return *it;
 		}
 	}
+	return nullptr;
 }
+
+/**
+ * пытается найти команду в векторе команд по ее имени
+ * @param commandName имя команды
+ * @return указатель на класс нужной команды или nullptr
+ */
+Command *Server::findCommandByName(std::string commandName) {
+	std::vector<Command *>::iterator it; //итератор по вектору команд
+	for(it = this->commands.begin(); it != this->commands.end(); it++){
+		Command *curCommand = *it;
+		if (curCommand->getName() == commandName){
+			return *it;
+		}
+	}
+	return nullptr;
+}
+

@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <array>
+#include <vector>
 #include "User.hpp"
 
 /**
@@ -15,11 +16,14 @@
 class Command {
 protected:
 	std::string name;
+	std::vector<User *> &users;
 	std::array<std::string , 6> args; //todo: 6  is max count of command args
 public:
-	Command(std::array<std::string, 6> argsArray);
+	Command(std::vector<User *> &users);
 	virtual ~Command();
-	virtual void execute(User *user) = 0;
+	virtual void execute(User *receiver, User *sender) = 0;
+	std::string getName();
+	void setArgs(std::string argString);
 };
 
 

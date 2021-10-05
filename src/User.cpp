@@ -23,3 +23,19 @@ void User::setMessage(std::string newMessage) {
 std::string User::getMessage() {
 	return message;
 }
+
+void User::setName(std::string name) {
+	this->name = name;
+}
+
+std::string User::getName() {
+	return this->name;
+}
+
+void User::setRealName(std::string realName) {
+	this->realName = realName;
+}
+
+std::string User::getRealName() {
+	return this->realName;
+}
