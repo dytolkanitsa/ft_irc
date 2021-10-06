@@ -4,7 +4,7 @@
 
 #include "UserCommand.hpp"
 
-UserCommand::UserCommand() : Command(<#initializer#>), Command(<#initializer#>) {
+UserCommand::UserCommand(std::vector<User *> &users) : Command(users){
 	this->name = "USER";
 }
 

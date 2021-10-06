@@ -9,7 +9,7 @@
 
 class UserCommand : public Command{
 public:
-	UserCommand();
+	UserCommand(std::vector<User *> &users);
 	void execute(User *receiver, User *sender) override;
 };
 

@@ -16,8 +16,8 @@
 
 Server::Server(const std::string *host, const std::string &port, const std::string &password)
 : host(nullptr), port(port), password(password), socketFd(-1) {
-	commands.push_back(new PrivateMessageCommand(<#initializer#>, <#initializer#>));
-	commands.push_back(new UserCommand());
+	commands.push_back(new PrivateMessageCommand(this->users));
+	commands.push_back(new UserCommand(this->users));
 	//todo: add commands
 }
 
