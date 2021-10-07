@@ -8,7 +8,8 @@ include_directories(src/)
 add_executable(ft_irc
         main.cpp
         src/Server.cpp
-        src/User.cpp src/Command.cpp src/Command.hpp src/PrivateMessageCommand.cpp src/PrivateMessageCommand.hpp src/UserCommand.cpp src/UserCommand.hpp)
+        src/User.cpp
+        )
 
 add_executable(showip
         showip.cpp)

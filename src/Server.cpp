@@ -201,23 +201,23 @@ void Server::recvMessage(User *user) {
  * @param user класс пользователя, который отправляет сообщение
  */
 void Server::sendMessage(User *user) {
-	std::string message = user->getMessage();
-	std::string command = message.substr(0,message.find(' '));
-	Command *curCommand;
-	curCommand = this->findCommandByName(command);
+//	std::string message = user->getMessage();
+//	std::string command = message.substr(0,message.find(' '));
+//	Command *curCommand;
+//	curCommand = this->findCommandByName(command);
+//	curCommand->setArgs(message);
+	std::vector<User *>::iterator	itUser;
+	User *curUser;
 
-//	std::vector<User *>::iterator	itUser;
-//	User *curUser;
-//
-//	for (itUser = users.begin(); itUser != users.end(); itUser++){
-//		curUser = *itUser;
-//		/*if (*itUser == user){
-//			не отправляем сообщение
-//		} else */if (curUser != user){
-//			send(curUser->getSocketFd(), user->getMessage().c_str(), user->getMessage().length(), 0);
+	for (itUser = users.begin(); itUser != users.end(); itUser++){
+		curUser = *itUser;
+		/*if (*itUser == user){
+			не отправляем сообщение
+		} else */if (curUser != user){
+			send(curUser->getSocketFd(), user->getMessage().c_str(), user->getMessage().length(), 0);
 //			отправляем
-//		}
-//	}
+		}
+	}
 }
 
 /**
@@ -241,7 +241,7 @@ User *Server::findUserByName(std::string userName) { //перейдет в кл�
  * @param commandName имя команды
  * @return указатель на класс нужной команды или nullptr
  */
-Command *Server::findCommandByName(std::string commandName) {
+/*Command *Server::findCommandByName(std::string commandName) {
 	std::vector<Command *>::iterator it; //итератор по вектору команд
 	for(it = this->commands.begin(); it != this->commands.end(); it++){
 		Command *curCommand = *it;
@@ -250,5 +250,37 @@ Command *Server::findCommandByName(std::string commandName) {
 		}
 	}
 	return nullptr;
+}*/
+/**
+* разделяет строку по пробелам и возвращает полученный массив, заранее отделяя агрумент после ':'
+* @param argString строка-сообщение
+* @return вектор аргументов
+*/
+std::vector<std::string> Server::setArgs(std::string argString) {
+	std::vector<std::string> args;
+	std::string lastArg;
+	size_t pos = 0;
+	size_t newPos;
+
+	newPos = argString.find(':', 0);
+	if (newPos != std::string::npos){
+		lastArg = argString.substr(newPos);
+		argString.erase(newPos);
+	}
+	int i;
+	for (i = 0; i < 6; i++){
+		newPos = argString.find(' ', pos);
+		if (newPos == std::string::npos)
+		{
+			args.push_back(argString.substr(pos, newPos - pos));
+			break;
+		}
+		args.push_back(argString.substr(pos, newPos - pos));
+		pos = newPos + 1;
+	}
+	if (!lastArg.empty())
+		args[i] = lastArg;
+	return args;
+
 }
 
