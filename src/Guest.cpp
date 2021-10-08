@@ -10,7 +10,7 @@ Guest::Guest(int socketFd, char *host, int port) : socketFd(socketFd), host(host
 }
 
 bool Guest::isFullyRegister() {
-	if (!this->name.empty() && !this->realName.empty() && !this->password.empty()){
+	if (!this->nickName.empty() && !this->realName.empty() && !this->password.empty()){
 		return true;
 	} else {
 		return false;

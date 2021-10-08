@@ -25,11 +25,11 @@ std::string User::getMessage() {
 }
 
 void User::setName(std::string name) {
-	this->name = name;
+	this->nickName = name;
 }
 
 std::string User::getName() {
-	return this->name;
+	return this->nickName;
 }
 
 void User::setRealName(std::string realName) {

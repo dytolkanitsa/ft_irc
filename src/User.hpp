@@ -10,7 +10,7 @@
 class User {
 private:
 	int socketFd;
-	std::string name;
+	std::string nickName;
 	std::string realName;
 	std::string host;
 	int port; //todo: uint32_t ?
