@@ -145,22 +145,31 @@ void Server::acceptProcess() {
 					//todo: fcntl error
 					throw std::runtime_error("fcntl error");
 				}
-					std::cout<< "cs:" << clientSocket << std::endl;
-					std::cout<< "sfd:" << this->socketFd << std::endl;
-					//нужно создать пользователя
-					User *user = new User(clientSocket, inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port));
-					//а теперь добавить его в "массив" пользователей в сервере
-					this->users.push_back(user);
-//					break;
+				std::cout<< "cs:" << clientSocket << std::endl;
+				std::cout<< "sfd:" << this->socketFd << std::endl;
+				//нужно создать пользователя
+				//User *user = new User(clientSocket, inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port));
+				//а теперь добавить его в "массив" пользователей в сервере
+				//this->users.push_back(user);
+				//break;
+				// сейчас мы сначла создаем гостя
+				Guest *guest = new Guest(clientSocket, inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port));
+				this->guests.push_back(guest);
 			}
 			else { ///нужно принять данные не с основного сокета, который мы слушаем(клиентского?)
 				try {
 					std::cout << "fd: " << nowPollfd.fd << std::endl;
+
+					///нуно найти это фдшник юзера или гостя
+					//this->findUserByFd(nowPollfd.fd);
+					//this->findGuestByFd(nowPollfd.fd);
+
+					//после этого вся остальная шняга
 //					std::vector<User *>::iterator	itUser = users.begin();
 //					std::advance(itUser, std::distance(fds.begin(), itFds) - 1);
 					//				itUser->getSocketFd();
-					recvMessage(this->users[i ? i - 1 : 0]);
-					sendMessage(this->users[i ? i - 1 : 0]);
+//					recvMessage(this->users[i ? i - 1 : 0]);
+//					sendMessage(this->users[i ? i - 1 : 0]);
 				} catch (std::runtime_error & e) {
 					std::cout << e.what() << std::endl;
 				}
@@ -171,6 +180,8 @@ void Server::acceptProcess() {
 	}
 }
 
+
+
 /**
  * функция для получения сообщения и добавления к нему "\r\n"
  * @param user класс пользователя для получения сообщения
@@ -179,7 +190,7 @@ void Server::recvMessage(User *user) {
 	char message[100]; /*todo: 100?*/
 	ssize_t recvByte;
 	memset(message, '\0', sizeof(message));
-	recvByte = recv(user->getSocketFd(), message, sizeof(message), 0);
+	recvByte = recv(user->getSocketFd(), message, 98, 0);//98 потому что + "\r\n"
 	if (recvByte <= 0){
 		//todo: error;
 //		throw std::runtime_error("recv < 0");
@@ -280,5 +291,33 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 		args[i] = lastArg;
 	return args;
 
+}
+
+/**
+ * пытается найти среди вектора гостей гостя с совпадающим фдшником
+ * @param fd необходимый фд
+ * @return возвращает указатель на гостя или nullptr, если не нашел
+ */
+Guest *Server::findGuestByFd(int fd) {
+	for (int i = 0; i < this->guests.size(); i++) {
+		if (fd == this->guests[i]->getFd()){
+			return this->guests[i];
+		}
+	}
+	return nullptr;
+}
+
+/**
+ * пытается найти среди вектора пользователей пользователя с совпадающим фдшником
+ * @param fd необходимый фд
+ * @return возвращает указатель на пользователя или nullptr, если не нашел
+ */
+User *Server::findUserByFd(int fd) {
+	for (int i = 0; i < this->users.size(); i++){
+		if (fd == this->users[i]->getSocketFd()){
+			return this->users[i];
+		}
+	}
+	return nullptr;
 }
 
