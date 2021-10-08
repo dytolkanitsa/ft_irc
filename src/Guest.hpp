@@ -20,9 +20,22 @@ public:
 	Guest(int socketFd, char *host, int port);
 	virtual ~Guest();
 	bool isFullyRegister();
-	int getFd() const;
 
-	//сеттеры геттеры
+	int 			getSocketFd() const;
+	int				getPort(void);
+	std::string 	getHost(void);
+	std::string 	getNickName(void);
+	std::string 	getRealName(void);
+	std::string		getPassword(void);
+	std::string 	getMessage(void);
+
+	void	setSocketFd(int sockt);
+	void	setPort(int port);
+	void	setHost(std::string host);
+	void	setNickName(std::string nickName);
+	void	setRealName(std::string realName);
+	void	setPassword(std::string password);
+	void 	setMessage(std::string message);
 	
 };
 

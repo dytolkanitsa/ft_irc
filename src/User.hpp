@@ -24,7 +24,7 @@ public:
 	User(int socketFd, char *host, int port);
 	virtual ~User();
 
-	// void	messageToUser(std::string str);
+	void	messageToUser(std::string msg);
 
 	std::string 	getNickName(void);
 	int 			getSocketFd(void);
