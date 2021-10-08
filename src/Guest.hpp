@@ -21,6 +21,9 @@ public:
 	virtual ~Guest();
 	bool isFullyRegister();
 	int getFd() const;
+
+	//сеттеры геттеры
+	
 };
 
 

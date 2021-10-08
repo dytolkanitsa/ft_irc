@@ -4,38 +4,57 @@
 
 #include "User.hpp"
 
-User::User(int socketFd, char *host, int port) : socketFd(socketFd), host(host), port(port){
-
+User::User(int socketFd, char *host, int port) : _socketFd(socketFd), _host(host), _port(port){
 }
 
 User::~User() {
-
 }
 
-int User::getSocketFd() {
+
+std::string	getNickName(void) {
+	return nickName;
+}
+
+int	getSocketFd(void) {
 	return socketFd;
 }
 
-void User::setMessage(std::string newMessage) {
-	this->message = newMessage;
+std::string	getHost(void) {
+	return host;
 }
 
-std::string User::getMessage() {
+int	getPort(void) {
+	return port;
+}
+
+std::string 	getMessage(void) {
 	return message;
 }
 
-void User::setName(std::string name) {
-	this->name = name;
+std::string 	getRealName(void) {
+	return realName;
 }
 
-std::string User::getName() {
-	return this->name;
+void	setNickName(std::string nickName) {
+	return this->nickName = nickName;
 }
 
-void User::setRealName(std::string realName) {
-	this->realName = realName;
+void	setSocketFd(int sockt) {
+	return this->socketFd = sockt;
 }
 
-std::string User::getRealName() {
-	return this->realName;
+void	setHost(std::string host) {
+	return this->host = host;
+}
+
+void	setPort(int port) {
+	return this->port = port;
+}
+
+void	setRealName(std::string realName) {
+	return this->realName = realName;
+}
+
+void 	setMessage(std::string message) {
+	return this->message = message;
 }

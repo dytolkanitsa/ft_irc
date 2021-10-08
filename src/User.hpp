@@ -9,25 +9,44 @@
 
 class User {
 private:
-	int socketFd;
-	std::string name;
+	int 		socketFd;
+	std::string nickName;
 	std::string realName;
 	std::string host;
-	int port; //todo: uint32_t ?
+	int 		port; //todo: uint32_t ?
 	std::string message;
+
+	// bool	enterPassword;
+	// bool	registered;
+	// bool	isOperator;
+
 public:
 	User(int socketFd, char *host, int port);
 	virtual ~User();
 
-	int getSocketFd();
-	void setMessage(std::string newMessage);
-	std::string getMessage();
+	// void	messageToUser(std::string str);
 
-	void setName(std::string name);
-	std::string getName();
+	std::string 	getNickName(void);
+	int 			getSocketFd(void);
+	std::string 	getHost(void);
+	int				getPort(void);
+	std::string 	getMessage(void);
+	std::string 	getRealName(void);
 
-	void setRealName(std::string realName);
-	std::string getRealName();
+	// bool	getEnterPassword(void) {return enterPassword;} // 7
+	// bool	getRegistered(void) {return registered;} // 8
+	// bool	getIsOperator(void) {return isOperator;} // 9
+
+	void	setNickName(std::string nickName);
+	void	setSocketFd(int sockt);
+	void	setHost(std::string host);
+	void	setPort(int port);
+	void	setRealName(std::string realName);
+	void 	setMessage(std::string message);
+
+	// void	setEnterPassword(bool param) {return enterPassword = param;} // 7
+	// void	setRegistered(bool param) {return registered = param;} // 8
+	// void	setIsOperator(bool param) {return isOperato = param;} // 9
 
 };
 
