@@ -31,6 +31,7 @@ std::string 	getMessage(void) {
 	return message;
 }
 
+<<<<<<< HEAD
 std::string 	getRealName(void) {
 	return realName;
 }

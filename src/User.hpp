@@ -9,7 +9,7 @@
 
 class User {
 private:
-	int 		socketFd;
+	int socketFd;
 	std::string nickName;
 	std::string realName;
 	std::string host;

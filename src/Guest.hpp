@@ -12,7 +12,7 @@ private:
 	int socketFd;
 	int port;
 	std::string host;
-	std::string name;
+	std::string nickName;
 	std::string realName;
 	std::string password;
 	std::string message;
