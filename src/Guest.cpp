@@ -47,29 +47,29 @@ std::string	Guest::getMessage(void) {
 }
 
 void	Guest::setSocketFd(int sockt) {
-	return this->socketFd = sockt;
+	this->socketFd = sockt;
 }
 
 void	Guest::setPort(int port){
-	return this->port = port;
+	this->port = port;
 }
 
 void	Guest::setHost(std::string host) {
-	return this->host = host;
+	this->host = host;
 }
 
 void	Guest::setNickName(std::string nickName) {
-	return this->nickName = nickName;
+	this->nickName = nickName;
 }
 
 void	Guest::setRealName(std::string realName) {
-	return this->realName = realName;
+	this->realName = realName;
 }
 
 void	Guest::setPassword(std::string password) {
-	return this->password = password;
+	this->password = password;
 }
 
 void 	Guest::setMessage(std::string message) {
-	return this->message = message;
+	this->message = message;
 }
