@@ -29,11 +29,13 @@ public:
 //	void stop();
 	virtual ~Server();
 	void acceptProcess();
-	void recvMessage(User * user);
+	std::string recvMessage(int fd);
 	void sendMessage(User * user);
 	User *findUserByName(std::string userName);
 	Guest *findGuestByFd(int fd);
 	User *findUserByFd(int fd);
+	void programProcess(User *user);
+	void programProcess(Guest *guest);
 //	Command *findCommandByName(std::string commandName); нужна map
 	std::vector<std::string> setArgs(std::string argString);
 

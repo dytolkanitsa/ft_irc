@@ -159,7 +159,12 @@ void Server::acceptProcess() {
 			else { ///нужно принять данные не с основного сокета, который мы слушаем(клиентского?)
 				try {
 					std::cout << "fd: " << nowPollfd.fd << std::endl;
-
+					User * curUser = findUserByFd(nowPollfd.fd);
+					if (curUser == nullptr){
+						Guest * curGuest = findGuestByFd(nowPollfd.fd);
+						curGuest->setMessage(recvMessage(curGuest->getSocketFd()));
+					}
+					curUser->setMessage(recvMessage(curUser->getSocketFd()));
 					///нуно найти это фдшник юзера или гостя
 					//this->findUserByFd(nowPollfd.fd);
 					//this->findGuestByFd(nowPollfd.fd);
@@ -168,7 +173,6 @@ void Server::acceptProcess() {
 //					std::vector<User *>::iterator	itUser = users.begin();
 //					std::advance(itUser, std::distance(fds.begin(), itFds) - 1);
 					//				itUser->getSocketFd();
-//					recvMessage(this->users[i ? i - 1 : 0]);
 //					sendMessage(this->users[i ? i - 1 : 0]);
 				} catch (std::runtime_error & e) {
 					std::cout << e.what() << std::endl;
@@ -186,20 +190,19 @@ void Server::acceptProcess() {
  * функция для получения сообщения и добавления к нему "\r\n"
  * @param user класс пользователя для получения сообщения
  */
-void Server::recvMessage(User *user) {
+std::string Server::recvMessage(int fd) {
 	char message[100]; /*todo: 100?*/
 	ssize_t recvByte;
 	memset(message, '\0', sizeof(message));
-	recvByte = recv(user->getSocketFd(), message, 98, 0);//98 потому что + "\r\n"
+	recvByte = recv(fd, message, sizeof(message) -2, 0);//потому что + "\r\n"
 	if (recvByte <= 0){
 		//todo: error;
 //		throw std::runtime_error("recv < 0");
-		return;
 	}
 	message[strlen(message) + 1] = '\r';
 	message[strlen(message) + 2] = '\n';
-	user->setMessage(message);
 	std::cout << "💬 ➡ " << message << " ⬅ 🐢" << std::endl;
+	return (message);
 }
 
 
@@ -238,7 +241,7 @@ User *Server::findUserByName(std::string userName) { //перейдет в кл�
 	std::vector<User *>::iterator it; // итератор по юзерам
 	for(it = this->users.begin(); it != this->users.end(); it++){
 		User *curUser = *it;
-		if (curUser->getName() == userName){
+		if (curUser->getNickName() == userName){
 			return *it;
 		}
 	}
@@ -300,7 +303,7 @@ std::vector<std::string> Server::setArgs(std::string argString) {
  */
 Guest *Server::findGuestByFd(int fd) {
 	for (int i = 0; i < this->guests.size(); i++) {
-		if (fd == this->guests[i]->getFd()){
+		if (fd == this->guests[i]->getSocketFd()){
 			return this->guests[i];
 		}
 	}
@@ -319,5 +322,23 @@ User *Server::findUserByFd(int fd) {
 		}
 	}
 	return nullptr;
+}
+
+/**
+ * находит какую команду вызывает Юзер и выполняет ее
+ * @param user указатель на юзера, который отправил сообщение
+ */
+void Server::programProcess(User *user) {
+	std::vector<std::string> args = setArgs(user->getMessage());
+//	args[0] - имя комманды, которое надо будет найти в мапе
+}
+
+/**
+ * находит какую команду вызывает гость и выполняет ее
+ * @param guest указатель на гостя, который отправил сообщение
+ */
+void Server::programProcess(Guest *guest) {
+	std::vector<std::string> args = setArgs(guest->getMessage());
+	//	args[0] - имя комманды, которое надо будет найти в мапе
 }
 
