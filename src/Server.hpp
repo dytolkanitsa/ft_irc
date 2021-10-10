@@ -44,6 +44,9 @@ public:
 	void nickCommand(std::vector<std::string> *args, User *user);
 	void operCommand(std::vector<std::string> *args, User *user);
 	void privmsgCommand(std::vector<std::string> *args, User *user);
+	void joinCommand(std::vector<std::string> *args, User *user);
+	void namesCommand(std::vector<std::string> *args, User *user);
+
 
 
 

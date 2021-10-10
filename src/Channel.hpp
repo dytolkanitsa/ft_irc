@@ -21,5 +21,6 @@ public:
 	void	setUser(User* user);
 	void	sendMessageToChannel(std::string msg);
 	void	removeUser(std::string userName);
-}
+};
+
 #endif

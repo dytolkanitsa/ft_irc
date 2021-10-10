@@ -416,7 +416,7 @@ void Server::privmsgCommand(std::vector<std::string> *args, User *user) {
 		throw std::runtime_error("Wrong count of args: PRIVMSG <receiver>{,<receiver>} <text to be sent>");
 	} else {
 		std::vector<std::string> receivers = getReceivers(args->at(1));
-		for (int i = 1; i < receivers.size() - 2; i++){
+		for (int i = 1; i < receivers.size(); i++){
 			User *recipientUser = this->findUserByName(receivers.at(i));
 			if (recipientUser != nullptr){
 				//отправить сообщение юзеру
@@ -430,6 +430,37 @@ void Server::privmsgCommand(std::vector<std::string> *args, User *user) {
 
 		}
 	}
+}
+
+void Server::joinCommand(std::vector<std::string> *args, User *user) {
+	if (args->size() != 2){
+		throw std::runtime_error("Wrong count of args: JOIN <channel>{,<channel>}");
+	}
+	std::vector<std::string> channelsForJoin = getReceivers(args->at(1));
+	for (int i = 1; i < channelsForJoin.size(); i++){
+		Channel *channel = findChannelByName(channelsForJoin[i]);
+		if (channel == nullptr){
+			//создать канал
+		} else {
+			//отправить сообщение на канал
+		}
+	}
+}
+
+void Server::namesCommand(std::vector<std::string> *args, User *user) {
+	if (args->size() != 1){ //todo: 1?
+		throw std::runtime_error("Wrong count of args: NAMES [<channel>{,<channel>}]");
+	}
+	if (args->size() > 1){
+		std::vector<std::string> namesChannels = getReceivers(args->at(1));
+		for (int i = 1; i < namesChannels.size(); i++){
+			Channel *channel = findChannelByName(namesChannels[i]);
+			if (channel != nullptr){
+				//вывести пльзователей
+			}
+		}
+	}
+
 }
 
 
