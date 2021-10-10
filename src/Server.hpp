@@ -8,8 +8,12 @@
 #include <string>
 #include <sys/poll.h>
 #include <vector>
+#include <map>
+#include <functional>
 #include "User.hpp"
 #include "Guest.hpp"
+
+
 
 class Server {
 private:
@@ -20,8 +24,8 @@ private:
 	std::vector<pollfd> fds;
 	std::vector<User *> users;
 	std::vector<Guest *> guests;
-
 public:
+
 	Server(const std::string * host, const std::string & port, const std::string & password);
 	void init();
 
@@ -38,9 +42,8 @@ public:
 	void programProcess(Guest *guest);
 //	Command *findCommandByName(std::string commandName); нужна map
 	std::vector<std::string> setArgs(std::string argString);
-
+	void passCommand(std::vector<std::string> *args, User *user);
 
 
 };
-
 #endif //FT_IRC_SERVER_HPP

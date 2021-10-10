@@ -40,25 +40,29 @@ std::string 	User::getRealName(void) {
 }
 
 void	User::setNickName(std::string nickName) {
-	return this->nickName = nickName;
+	this->nickName = nickName;
 }
 
 void	User::setSocketFd(int sockt) {
-	return this->socketFd = sockt;
+	this->socketFd = sockt;
 }
 
 void	User::setHost(std::string host) {
-	return this->host = host;
+	this->host = host;
 }
 
 void	User::setPort(int port) {
-	return this->port = port;
+	this->port = port;
 }
 
 void	User::setRealName(std::string realName) {
-	return this->realName = realName;
+	this->realName = realName;
 }
 
 void 	User::setMessage(std::string message) {
-	return this->message = message;
+	this->message = message;
+}
+
+void User::setPassword(std::string pass) {
+	this->password = pass;
 }

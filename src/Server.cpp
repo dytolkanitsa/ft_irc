@@ -330,6 +330,24 @@ User *Server::findUserByFd(int fd) {
  */
 void Server::programProcess(User *user) {
 	std::vector<std::string> args = setArgs(user->getMessage());
+	if (args[0] == "USER"){}
+	else if (args[0] == "PASS"){
+		this->passCommand(&args,user);
+	}
+	else if (args[0] == "NICK"){}
+	else if (args[0] == "PRIVMSG"){}
+	else if (args[0] == "OPER"){}
+	else if (args[0] == "QUIT"){}
+	else if (args[0] == "JOIN"){}
+	else if (args[0] == "PART"){}
+	else if (args[0] == "MODE"){}
+	else if (args[0] == "NAMES"){}
+	else if (args[0] == "LIST"){}
+	else if (args[0] == "KICK"){}
+	else if (args[0] == "ADMIN"){}
+	else if (args[0] == "NOTICE"){}
+//	else if (args[0] == ""){}
+//	else if (args[0] == ""){}
 //	args[0] - имя комманды, которое надо будет найти в мапе
 }
 
@@ -340,5 +358,13 @@ void Server::programProcess(User *user) {
 void Server::programProcess(Guest *guest) {
 	std::vector<std::string> args = setArgs(guest->getMessage());
 	//	args[0] - имя комманды, которое надо будет найти в мапе
+}
+
+void Server::passCommand(std::vector<std::string> *args, User *user) {
+	if (args->size() != 2){
+		//todo: error args
+	} else{
+		user->setPassword(args->at(1));
+	}
 }
 

@@ -15,7 +15,7 @@ private:
 	std::string host;
 	int 		port; //todo: uint32_t ?
 	std::string message;
-
+	std::string password;
 	// bool	enterPassword;
 	// bool	registered;
 	// bool	isOperator;
@@ -43,7 +43,7 @@ public:
 	void	setPort(int port);
 	void	setRealName(std::string realName);
 	void 	setMessage(std::string message);
-
+	void	setPassword(std::string pass);
 	// void	setEnterPassword(bool param) {return enterPassword = param;} // 7
 	// void	setRegistered(bool param) {return registered = param;} // 8
 	// void	setIsOperator(bool param) {return isOperato = param;} // 9
