@@ -158,9 +158,7 @@ void Server::acceptProcess() {
 					User * curUser = findUserByFd(nowPollfd.fd);
 					curUser->setMessage(recvMessage(curUser->getSocketFd()));
 					///нуно найти это фдшник юзера или гостя
-					//this->findUserByFd(nowPollfd.fd);
-					//this->findGuestByFd(nowPollfd.fd);
-
+					this->commandProcess(curUser);
 					//после этого вся остальная шняга
 //					std::vector<User *>::iterator	itUser = users.begin();
 //					std::advance(itUser, std::distance(fds.begin(), itFds) - 1);
@@ -288,6 +286,19 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 
 }
 
+/**
+ * пытется найти канал с нужным именем
+ * @param channelName имя канала, который нужно найти
+ * @return указатель на канал или nullptr при неудаче
+ */
+Channel *Server::findChannelByName(std::string channelName) {
+	for (int i = 0; i < this->channels.size(); i++){
+		if (channelName == this->channels[i]->getChannelName()){
+			return this->channels[i];
+		}
+	}
+	return  nullptr;
+}
 
 /**
  * пытается найти среди вектора пользователей пользователя с совпадающим фдшником
@@ -307,15 +318,23 @@ User *Server::findUserByFd(int fd) {
  * находит какую команду вызывает Юзер и выполняет ее
  * @param user указатель на юзера, который отправил сообщение
  */
-void Server::programProcess(User *user) {
+void Server::commandProcess(User *user) {
 	std::vector<std::string> args = setArgs(user->getMessage());
-	if (args[0] == "USER"){}
+	if (args[0] == "USER"){
+		this->userCommand(&args, user);
+	}
 	else if (args[0] == "PASS"){
 		this->passCommand(&args,user);
 	}
-	else if (args[0] == "NICK"){}
-	else if (args[0] == "PRIVMSG"){}
-	else if (args[0] == "OPER"){}
+	else if (args[0] == "NICK"){
+		this->nickCommand(&args, user);
+	}
+	else if (args[0] == "PRIVMSG"){
+		this->privmsgCommand(&args, user);
+	}
+	else if (args[0] == "OPER"){
+		this->operCommand(&args, user);
+	}
 	else if (args[0] == "QUIT"){}
 	else if (args[0] == "JOIN"){}
 	else if (args[0] == "PART"){}
@@ -339,3 +358,82 @@ void Server::passCommand(std::vector<std::string> *args, User *user) {
 	}
 }
 
+void Server::userCommand(std::vector<std::string> *args, User *user) {
+	if (args->size() != 5){
+		throw std::runtime_error("Wrong count of args: PASS <password>");
+		//todo: error args
+	} else{
+		user->setRealName(args->at(4));
+//		user->setUsername(args->at(2)); //todo: username?
+	}
+}
+
+void Server::nickCommand(std::vector<std::string> *args, User *user) {
+	if (args->size() != 2){
+		throw std::runtime_error("Wrong count of args: NICK <nickname>");
+		//todo:: error args
+	} else {
+		user->setNickName(args->at(1));
+	}
+}
+
+void Server::operCommand(std::vector<std::string> *args, User *user) {
+	if (args->size() != 3){
+		throw std::runtime_error("Wrong count of args: OPER <user> <password>");
+	} else{
+		if (user->getNickName() == args->at(1) && user->getPassword() == args->at(2)){
+			user->makeOperator();
+		} else{
+			throw std::runtime_error("Wrong user or password");
+		}
+	}
+}
+
+/**
+ * разбивает сроку по запятым
+ * @param receivers срока, которую нужно разбить
+ * @return
+ */
+std::vector<std::string> getReceivers(const std::string& receivers){ //todo: не тестировала
+	std::vector<std::string> result;
+	size_t pos = 0;
+	size_t newPos;
+
+	for (int i = 0; newPos != std::string::npos; i++){
+		newPos = receivers.find(',', pos);
+		if (newPos == std::string::npos)
+			result.push_back(receivers.substr(pos));
+		else
+			result.push_back(receivers.substr(pos, newPos - pos));
+		pos = newPos + 1;
+	}
+	return result;
+}
+
+void Server::privmsgCommand(std::vector<std::string> *args, User *user) {
+	unsigned long size = args->size();
+	if (size != 2){
+		throw std::runtime_error("Wrong count of args: PRIVMSG <receiver>{,<receiver>} <text to be sent>");
+	} else {
+		std::vector<std::string> receivers = getReceivers(args->at(1));
+		for (int i = 1; i < receivers.size() - 2; i++){
+			User *recipientUser = this->findUserByName(receivers.at(i));
+			if (recipientUser != nullptr){
+				//отправить сообщение юзеру
+			} else{
+				Channel *channel = this->findChannelByName(receivers.at(i));
+				//отправить сообщение в канал
+				if (channel == nullptr){
+					throw std::runtime_error("Wrong receiver");
+				}
+			}
+
+		}
+	}
+}
+
+
+
+
+
+//throw std::runtime_error("Wrong count of args: ");

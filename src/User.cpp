@@ -61,3 +61,15 @@ void 	User::setMessage(std::string message) {
 void User::setPassword(std::string pass) {
 	this->password = pass;
 }
+
+std::string User::getPassword() {
+	return this->password;
+}
+
+void User::makeOperator() {
+	this->isOperator = true;
+}
+
+void User::removeOperator() {
+	this->isOperator = false;
+}
