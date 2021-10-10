@@ -8,10 +8,7 @@
 #include <string>
 #include <sys/poll.h>
 #include <vector>
-#include <map>
-#include <functional>
 #include "User.hpp"
-#include "Guest.hpp"
 
 
 
@@ -23,7 +20,6 @@ private:
 	const std::string & password;
 	std::vector<pollfd> fds;
 	std::vector<User *> users;
-	std::vector<Guest *> guests;
 public:
 
 	Server(const std::string * host, const std::string & port, const std::string & password);
@@ -36,10 +32,8 @@ public:
 	std::string recvMessage(int fd);
 	void sendMessage(User * user);
 	User *findUserByName(std::string userName);
-	Guest *findGuestByFd(int fd);
 	User *findUserByFd(int fd);
 	void programProcess(User *user);
-	void programProcess(Guest *guest);
 //	Command *findCommandByName(std::string commandName); нужна map
 	std::vector<std::string> setArgs(std::string argString);
 	void passCommand(std::vector<std::string> *args, User *user);

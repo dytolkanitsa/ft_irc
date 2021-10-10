@@ -9,7 +9,7 @@ add_executable(ft_irc
         main.cpp
         src/Server.cpp
         src/User.cpp
-        src/Guest.cpp src/Guest.hpp)
+        )
 
 add_executable(showip
         showip.cpp)

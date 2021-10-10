@@ -148,22 +148,14 @@ void Server::acceptProcess() {
 				std::cout<< "cs:" << clientSocket << std::endl;
 				std::cout<< "sfd:" << this->socketFd << std::endl;
 				//нужно создать пользователя
-				//User *user = new User(clientSocket, inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port));
+				User *user = new User(clientSocket, inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port));
 				//а теперь добавить его в "массив" пользователей в сервере
-				//this->users.push_back(user);
-				//break;
-				// сейчас мы сначла создаем гостя
-				Guest *guest = new Guest(clientSocket, inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port));
-				this->guests.push_back(guest);
+				this->users.push_back(user);
 			}
 			else { ///нужно принять данные не с основного сокета, который мы слушаем(клиентского?)
 				try {
 					std::cout << "fd: " << nowPollfd.fd << std::endl;
 					User * curUser = findUserByFd(nowPollfd.fd);
-					if (curUser == nullptr){
-						Guest * curGuest = findGuestByFd(nowPollfd.fd);
-						curGuest->setMessage(recvMessage(curGuest->getSocketFd()));
-					}
 					curUser->setMessage(recvMessage(curUser->getSocketFd()));
 					///нуно найти это фдшник юзера или гостя
 					//this->findUserByFd(nowPollfd.fd);
@@ -296,19 +288,6 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 
 }
 
-/**
- * пытается найти среди вектора гостей гостя с совпадающим фдшником
- * @param fd необходимый фд
- * @return возвращает указатель на гостя или nullptr, если не нашел
- */
-Guest *Server::findGuestByFd(int fd) {
-	for (int i = 0; i < this->guests.size(); i++) {
-		if (fd == this->guests[i]->getSocketFd()){
-			return this->guests[i];
-		}
-	}
-	return nullptr;
-}
 
 /**
  * пытается найти среди вектора пользователей пользователя с совпадающим фдшником
@@ -351,14 +330,6 @@ void Server::programProcess(User *user) {
 //	args[0] - имя комманды, которое надо будет найти в мапе
 }
 
-/**
- * находит какую команду вызывает гость и выполняет ее
- * @param guest указатель на гостя, который отправил сообщение
- */
-void Server::programProcess(Guest *guest) {
-	std::vector<std::string> args = setArgs(guest->getMessage());
-	//	args[0] - имя комманды, которое надо будет найти в мапе
-}
 
 void Server::passCommand(std::vector<std::string> *args, User *user) {
 	if (args->size() != 2){

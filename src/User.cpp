@@ -4,15 +4,10 @@
 
 #include "User.hpp"
 
-User::User(int socketFd, char *host, int port) : _socketFd(socketFd), _host(host), _port(port){
+User::User(int socketFd, char *host, int port) : socketFd(socketFd), host(host), port(port){
 }
 
 User::~User() {
-}
-
-void	messageToUser(std::string msg)
-{
-	send(this->socketFd, msg.c_str(), msg.length(), 0);
 }
 
 std::string	User::getNickName(void) {
