@@ -243,13 +243,11 @@ void Server::commandProcess(User *user) {
 	else if (args[0] == "QUIT"){}
 	else if (args[0] == "JOIN"){}
 	else if (args[0] == "PART"){}
-	else if (args[0] == "MODE"){}
 	else if (args[0] == "NAMES"){}
 	else if (args[0] == "LIST"){}
 	else if (args[0] == "KICK"){}
 	else if (args[0] == "ADMIN"){}
 	else if (args[0] == "NOTICE"){}
-//	else if (args[0] == ""){}
 //	else if (args[0] == ""){}
 //	args[0] - имя комманды, которое надо будет найти в мапе
 }
