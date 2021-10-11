@@ -25,20 +25,19 @@ private:
 public:
 
 	Server(const std::string * host, const std::string & port, const std::string & password);
-	void init();
+	virtual ~Server();
 
 	[[noreturn]] void start();
-//	void stop();
-	virtual ~Server();
+	void init();
+
 	void acceptProcess();
+	std::vector<std::string> setArgs(std::string argString);
+	void commandProcess(User *user);
 	std::string recvMessage(int fd);
-	void sendMessage(User * user);
+
 	User *findUserByName(std::string userName);
 	User *findUserByFd(int fd);
 	Channel *findChannelByName(std::string channelName);
-	void commandProcess(User *user);
-//	Command *findCommandByName(std::string commandName); нужна map
-	std::vector<std::string> setArgs(std::string argString);
 
 	void passCommand(std::vector<std::string> *args, User *user);
 	void userCommand(std::vector<std::string> *args, User *user);
@@ -48,12 +47,7 @@ public:
 	void joinCommand(std::vector<std::string> *args, User *user);
 	void namesCommand(std::vector<std::string> *args, User *user);
 
-
 	void createChannel(User *user, std::string name);
 	void showUsers();
-
-
-
-
 };
 #endif //FT_IRC_SERVER_HPP

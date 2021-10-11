@@ -169,9 +169,14 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 	size_t pos = 0;
 	size_t newPos;
 
+	pos = argString.find("\r\n");
+	if (pos != std::string::npos){
+		argString = argString.substr(0, pos);
+	}
+
 	newPos = argString.find(':', 0);
 	if (newPos != std::string::npos){
-		lastArg = argString.substr(newPos);
+		lastArg = argString.substr(newPos + 1);
 		argString.erase(newPos);
 	}
 	int i;
@@ -317,11 +322,11 @@ std::vector<std::string> getReceivers(const std::string& receivers){ //todo: Ð½Ð
 
 void Server::privmsgCommand(std::vector<std::string> *args, User *user) {
 	unsigned long size = args->size();
-	if (size != 2){
+	if (size != 3){
 		throw std::runtime_error("Wrong count of args: PRIVMSG <receiver>{,<receiver>} <text to be sent>");
 	} else {
 		std::vector<std::string> receivers = getReceivers(args->at(1));
-		for (int i = 1; i < receivers.size(); i++){
+		for (int i = 0; i < receivers.size(); i++){
 			User *recipientUser = this->findUserByName(receivers.at(i));
 			if (recipientUser != nullptr){
 				recipientUser->messageToUser(args->at(args->size() -1));
