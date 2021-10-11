@@ -107,15 +107,14 @@ void Server::acceptProcess() {
 				}
 				std::cout<< "cs:" << clientSocket << std::endl;
 				std::cout<< "sfd:" << this->socketFd << std::endl;
-				User *user = new User(clientSocket, inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port));
+				User * user = new User(clientSocket);
 				this->users.push_back(user);
 			}
 			else { ///нужно принять данные не с основного сокета, который мы слушаем(клиентского?)
 				try {
 					std::cout << "fd: " << nowPollfd.fd << std::endl;
 					User * curUser = findUserByFd(nowPollfd.fd);
-					curUser->setMessage(recvMessage(curUser->getSocketFd()));
-					this->commandProcess(curUser);
+					this->commandProcess(*curUser, recvMessage(curUser->getSocketFd()));
 				} catch (std::runtime_error & e) {
 					std::cout << e.what() << std::endl;
 				}
@@ -147,12 +146,11 @@ std::string Server::recvMessage(int fd) {
  * @param userName имя предполагаемого пользователя, котрого нужно найти
  * @return указатель на пользователя с необходимым именем или nullptr
  */
-User *Server::findUserByName(std::string userName) { //перейдет в класс команды
+User * Server::findUserByName(const std::string & userName) const { //перейдет в класс команды
 	std::vector<User *>::iterator it; // итератор по юзерам
-	for(it = this->users.begin(); it != this->users.end(); it++){
-		User *curUser = *it;
-		if (curUser->getNickName() == userName){
-			return *it;
+	for(int i = 0; i < this->users.size(); i++) {
+		if (users[i]->getNickName() == userName) {
+			return users[i];
 		}
 	}
 	return nullptr;
@@ -228,74 +226,62 @@ User *Server::findUserByFd(int fd) {
  * находит какую команду вызывает Юзер и выполняет ее
  * @param user указатель на юзера, который отправил сообщение
  */
-void Server::commandProcess(User *user) {
-	std::vector<std::string> args = setArgs(user->getMessage());
-	if (args[0] == "USER"){
-		this->userCommand(&args, user);
-	}
-	else if (args[0] == "PASS"){
-		this->passCommand(&args,user);
-	}
-	else if (args[0] == "NICK"){
-		this->nickCommand(&args, user);
-	}
-	else if (args[0] == "PRIVMSG"){
-		this->privmsgCommand(&args, user);
-	}
-	else if (args[0] == "OPER"){
-		this->operCommand(&args, user);
-	}
-	else if (args[0] == "QUIT"){}
-	else if (args[0] == "JOIN"){}
-	else if (args[0] == "PART"){}
-	else if (args[0] == "MODE"){}
-	else if (args[0] == "NAMES"){}
-	else if (args[0] == "LIST"){}
-	else if (args[0] == "KICK"){}
-	else if (args[0] == "ADMIN"){}
-	else if (args[0] == "NOTICE"){}
-//	else if (args[0] == ""){}
-//	else if (args[0] == ""){}
-//	args[0] - имя комманды, которое надо будет найти в мапе
-}
-
-
-void Server::passCommand(std::vector<std::string> *args, User *user) {
-	if (args->size() != 2){
-		//todo: error args
-	} else{
-		user->setPassword(args->at(1));
-	}
-}
-
-void Server::userCommand(std::vector<std::string> *args, User *user) {
-	if (args->size() != 5){
-		throw std::runtime_error("Wrong count of args: PASS <password>");
-		//todo: error args
-	} else{
-		user->setRealName(args->at(4));
-//		user->setUsername(args->at(2)); //todo: username?
-	}
-}
-
-void Server::nickCommand(std::vector<std::string> *args, User *user) {
-	if (args->size() != 2){
-		throw std::runtime_error("Wrong count of args: NICK <nickname>");
-		//todo:: error args
-	} else {
-		user->setNickName(args->at(1));
-	}
-}
-
-void Server::operCommand(std::vector<std::string> *args, User *user) {
-	if (args->size() != 3){
-		throw std::runtime_error("Wrong count of args: OPER <user> <password>");
-	} else{
-		if (user->getNickName() == args->at(1) && user->getPassword() == args->at(2)){
-			user->makeOperator();
-		} else{
-			throw std::runtime_error("Wrong user or password");
+void Server::commandProcess(User & user, const std::string & message) {
+	std::vector<std::string> args = setArgs(message);
+	try {
+		std::string command = args[0];
+		args.erase(args.begin());
+		if (command == "PASS") {
+			this->passCommand(args, user);
 		}
+		else if (command == "USER") {
+			this->userCommand(args, user);
+		}
+		else if (command == "NICK") {
+			this->nickCommand(args, user);
+		}
+		else if (command == "PRIVMSG") {
+			this->privmsgCommand(args, user);
+		}
+		else if (command == "QUIT"){}
+		else if (args[0] == "JOIN"){}
+		else if (args[0] == "PART"){}
+		else if (args[0] == "MODE"){}
+		else if (args[0] == "NAMES"){}
+		else if (args[0] == "LIST"){}
+		else if (args[0] == "KICK"){}
+		else if (args[0] == "ADMIN"){}
+		else if (args[0] == "NOTICE"){}
+	} catch (std::runtime_error & error) {
+		user.messageToUser(error.what());
+	}
+}
+
+void Server::passCommand(std::vector<std::string> & args, User & user) const {
+	if (user.getEnterPassword())
+		throw alreadyRegistered(user.getNickName());
+	if (args.empty())
+		throw needMoreParams(user.getNickName(), "PASS");
+	if (args[0] != this->password) {
+		throw passMismatch(user.getNickName());
+	}
+}
+
+void Server::userCommand(std::vector<std::string> & args, User & user) const {
+	if (args.size() != 4) {
+		throw needMoreParams(user.getNickName(), "USER");
+	}
+	user.setRealName(args[3]);
+	user.setRegistered(true);
+}
+
+void Server::nickCommand(std::vector<std::string> & args, User & user) const {
+	std::string prevNick = user.getNickName();
+	if (args.empty()) {
+		throw needMoreParams(user.getNickName(), "NICK");
+	}
+	if (findUserByName(args[0])) {
+		throw nickInUse(user.getNickName(), args[0]);
 	}
 }
 
@@ -307,7 +293,7 @@ void Server::operCommand(std::vector<std::string> *args, User *user) {
 std::vector<std::string> getReceivers(const std::string& receivers){ //todo: не тестировала
 	std::vector<std::string> result;
 	size_t pos = 0;
-	size_t newPos;
+	size_t newPos = 0;
 
 	for (int i = 0; newPos != std::string::npos; i++){
 		newPos = receivers.find(',', pos);
@@ -320,52 +306,61 @@ std::vector<std::string> getReceivers(const std::string& receivers){ //todo: н�
 	return result;
 }
 
-void Server::privmsgCommand(std::vector<std::string> *args, User *user) {
-	unsigned long size = args->size();
-	if (size != 3){
-		throw std::runtime_error("Wrong count of args: PRIVMSG <receiver>{,<receiver>} <text to be sent>");
-	} else {
-		std::vector<std::string> receivers = getReceivers(args->at(1));
-		for (int i = 0; i < receivers.size(); i++){
+void Server::privmsgCommand(std::vector<std::string> & args, User & user) {
+	if (!user.getRegistered()) {
+		throw connectionRestricted(user.getNickName());
+	}
+	if (args.size() != 3) {
+		throw needMoreParams(user.getNickName(), "PRIVMSG");
+	}
+	else {
+		std::vector<std::string> receivers = getReceivers(args[1]);
+		for (int i = 0; i < receivers.size(); i++) {
 			User *recipientUser = this->findUserByName(receivers.at(i));
 			if (recipientUser != nullptr){
-				recipientUser->messageToUser(args->at(args->size() -1));
+				recipientUser->messageToUser(args[args.size() -1]);
 			} else{
 				Channel *channel = this->findChannelByName(receivers.at(i));
 				if (channel == nullptr){
 					throw std::runtime_error("Wrong receiver");
 				}
-				channel->sendMessageToChannel(args->at(args->size() -1), user);
+				channel->sendMessageToChannel(args.at(args.size() -1), &user);
 			}
 		}
 	}
 }
 
-void Server::joinCommand(std::vector<std::string> *args, User *user) {
-	if (args->size() != 2){
-		throw std::runtime_error("Wrong count of args: JOIN <channel>{,<channel>}");
+void Server::joinCommand(std::vector<std::string> & args, User & user) {
+	if (!user.getRegistered()) {
+		throw connectionRestricted(user.getNickName());
 	}
-	std::vector<std::string> channelsForJoin = getReceivers(args->at(1));
+	if (args.size() != 2){
+		throw needMoreParams(user.getNickName(), "JOIN");
+	}
+	std::vector<std::string> channelsForJoin = getReceivers(args.at(1));
 	for (int i = 1; i < channelsForJoin.size(); i++){
 		Channel *channel = findChannelByName(channelsForJoin[i]);
 		if (channel == nullptr){
-			createChannel(user, channelsForJoin[i]);
+			createChannel(&user, channelsForJoin[i]);
 		} else {
-			channel->sendMessageToChannel(args->at(args->size() - 1), user);
+			channel->sendMessageToChannel(args.at(args.size() - 1), &user);
 		}
 	}
 }
 
-void Server::namesCommand(std::vector<std::string> *args, User *user) {
-	if (args->size() != 1){ //todo: 1?
-		throw std::runtime_error("Wrong count of args: NAMES [<channel>{,<channel>}]");
+void Server::namesCommand(std::vector<std::string> & args, User & user) {
+	if (!user.getRegistered()) {
+		throw connectionRestricted(user.getNickName());
 	}
-	if (args->size() > 1){
-		std::vector<std::string> namesChannels = getReceivers(args->at(1));
-		for (int i = 1; i < namesChannels.size(); i++){
+	if (args.size() != 1) { //todo: 1!?
+		throw needMoreParams(user.getNickName(), "NAMES");
+	}
+	if (args.size() > 1) {
+		std::vector<std::string> namesChannels = getReceivers(args.at(1));
+		for (int i = 1; i < namesChannels.size(); i++ ){
 			Channel *channel = findChannelByName(namesChannels[i]);
-			if (channel != nullptr){
-				//вывести пльзователей
+			if (channel != nullptr) {
+				//todo: вывести пльзователей
 			}
 		}
 	}
@@ -386,4 +381,29 @@ void Server::showUsers() {
 
 }
 
-//throw std::runtime_error("Wrong count of args: ");
+std::string Server::constructError(const std::string & code,
+								   const std::string & message,
+								   const std::string & nick = "*",
+								   const std::string & secondParam = "") const {
+	return code + " " + nick + " " + secondParam + " " + ":" + message + "\r\n";
+}
+
+std::runtime_error Server::alreadyRegistered(const std::string & nick) const {
+	return std::runtime_error(constructError("462", "Not enough parameters", nick));
+}
+
+std::runtime_error Server::needMoreParams(const std::string & nick, const std::string & command) const {
+	return std::runtime_error(constructError("461", "Not enough parameters", nick));
+}
+
+std::runtime_error Server::passMismatch(const std::string & nick) const {
+	return std::runtime_error(constructError("464", "Password incorrect", nick));
+}
+
+std::runtime_error Server::nickInUse(const std::string & nick, const std::string & newNick) const {
+	return std::runtime_error(constructError("433", "Nickname is already in use", nick, newNick));
+}
+
+std::runtime_error Server::connectionRestricted(const std::string &nick) const {
+	return std::runtime_error(constructError("484", "Your connection is restricted!", nick));
+}

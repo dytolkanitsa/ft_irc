@@ -4,45 +4,36 @@
 
 #include "User.hpp"
 
-User::User(int socketFd, char *host, int port) : socketFd(socketFd){
-}
+User::User(int socketFd) : socketFd(socketFd), registered(false), enterPassword(false), isOperator(false), nickName("*"){}
 
 User::~User() {
 }
 
-std::string	User::getNickName(void) {
+std::string	User::getNickName() const {
 	return nickName;
 }
 
-int	User::getSocketFd(void) {
+int	User::getSocketFd() const {
 	return socketFd;
 }
 
-std::string 	User::getMessage(void) {
-	return message;
-}
-
-std::string 	User::getRealName(void) {
+std::string 	User::getRealName() {
 	return realName;
 }
 
-void	User::setNickName(std::string nickName) {
+void	User::setNickName(const std::string & nickName) {
 	this->nickName = nickName;
 }
 
-void	User::setSocketFd(int sockt) {
-	this->socketFd = sockt;
+void	User::setSocketFd(int socket) {
+	this->socketFd = socket;
 }
 
-void	User::setRealName(std::string realName) {
+void	User::setRealName(const std::string & realName) {
 	this->realName = realName;
 }
 
-void 	User::setMessage(std::string message) {
-	this->message = message;
-}
-
-void User::setPassword(std::string pass) {
+void User::setPassword(const std::string & pass) {
 	this->password = pass;
 }
 
@@ -58,6 +49,6 @@ void User::removeOperator() {
 	this->isOperator = false;
 }
 
-void User::messageToUser(std::string msg) {
+void User::messageToUser(const std::string & msg) const {
 	send(this->socketFd, msg.c_str(), msg.length(), 0);
 }
