@@ -26,11 +26,9 @@ public:
 	void init();
 
 	[[noreturn]] void start();
-//	void stop();
 	virtual ~Server();
 	void acceptProcess();
 	std::string recvMessage(int fd);
-	void sendMessage(User * user);
 	User *findUserByName(const std::string & userName) const;
 	User *findUserByFd(int fd);
 	Channel *findChannelByName(std::string channelName);

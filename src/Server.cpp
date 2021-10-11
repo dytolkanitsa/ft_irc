@@ -288,7 +288,7 @@ void Server::nickCommand(std::vector<std::string> & args, User & user) const {
 std::vector<std::string> getReceivers(const std::string& receivers){ //todo: не тестировала
 	std::vector<std::string> result;
 	size_t pos = 0;
-	size_t newPos;
+	size_t newPos = 0;
 
 	for (int i = 0; newPos != std::string::npos; i++){
 		newPos = receivers.find(',', pos);
