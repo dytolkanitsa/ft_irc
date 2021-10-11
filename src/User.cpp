@@ -34,6 +34,18 @@ std::string 	User::getRealName(void) {
 	return realName;
 }
 
+bool	getEnterPassword(void) {
+	return enterPassword;
+}
+
+bool	getRegistered(void) {
+	return registered;
+}
+
+bool	getIsOperator(void) {
+	return isOperator;
+}
+
 void	User::setNickName(std::string nickName) {
 	this->nickName = nickName;
 }
@@ -60,6 +72,18 @@ void 	User::setMessage(std::string message) {
 
 void User::setPassword(std::string pass) {
 	this->password = pass;
+}
+
+void	setEnterPassword(bool param) {
+	return enterPassword = param;
+}
+
+void	setRegistered(bool param) {
+	return registered = param;
+}
+
+void	setIsOperator(bool param) {
+	return isOperato = param;
 }
 
 std::string User::getPassword() {

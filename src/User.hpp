@@ -32,10 +32,6 @@ public:
 	std::string 	getRealName(void);
 	std::string		getPassword();
 
-	// bool	getEnterPassword(void) {return enterPassword;} // 7
-	// bool	getRegistered(void) {return registered;} // 8
-	// bool	getIsOperator(void) {return isOperator;} // 9
-
 	void	setNickName(std::string nickName);
 	void	setSocketFd(int sockt);
 	void	setRealName(std::string realName);
@@ -43,10 +39,6 @@ public:
 	void	setPassword(std::string pass);
 	void 	makeOperator();
 	void 	removeOperator();
-	// void	setEnterPassword(bool param) {return enterPassword = param;} // 7
-	// void	setRegistered(bool param) {return registered = param;} // 8
-	// void	setIsOperator(bool param) {return isOperato = param;} // 9
-
 };
 
 
