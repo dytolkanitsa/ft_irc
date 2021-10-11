@@ -46,13 +46,13 @@ void Channel::sendMessageToChannel(std::string msg, User *sender) {
 }
 
 void	 Channel::removeUser(std::string userName) {
-	// int found = 0; пусть пока побудет
+	 int found = 0; //пусть пока побудет
 	for (std::vector<User *>::const_iterator i = users.begin(); i != users.end(); i++)
 	{
 		if ((*i)->getNickName() == userName)
 			break;
-		// found++; // тоже пусть пока побудет
+		 found++; // тоже пусть пока побудет
 	}
 	// erase удаляет из вектора диапазон элементов начиная с found знакачивая длиной строки
-	this->users.erase(users.begin() + i);
+	this->users.erase(users.begin() + found);
 }
