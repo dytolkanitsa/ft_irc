@@ -165,11 +165,11 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 	std::vector<std::string> args;
 	std::string lastArg;
 	size_t pos = 0;
-	size_t newPos;
+	size_t newPos = 0;
 
-	pos = argString.find("\r\n");
-	if (pos != std::string::npos){
-		argString = argString.substr(0, pos);
+	newPos = argString.find("\r\n");
+	if (newPos != std::string::npos){
+		argString = argString.substr(0, newPos);
 	}
 
 	newPos = argString.find(':', 0);
@@ -178,7 +178,7 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 		argString.erase(newPos);
 	}
 	int i;
-	for (i = 0; i < 6; i++){
+	for (i = 0; i < 6; i++){ //todo: 6?
 		newPos = argString.find(' ', pos);
 		if (newPos == std::string::npos)
 		{
