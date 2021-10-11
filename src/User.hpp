@@ -21,15 +21,15 @@ private:
 	bool	isOperator;
 
 public:
-	explicit User(int socketFd);
+	User(int socketFd, char *host, int port);
 	virtual ~User();
 
-	void	messageToUser(const std::string & msg) const;
+	void	messageToUser(std::string msg);
 
-	std::string 	getNickName();
-	int 			getSocketFd();
-	std::string 	getMessage();
-	std::string 	getRealName();
+	std::string 	getNickName(void);
+	int 			getSocketFd(void);
+	std::string 	getMessage(void);
+	std::string 	getRealName(void);
 	std::string		getPassword();
 
 	 bool	getEnterPassword() const {return enterPassword;} // 7

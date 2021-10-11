@@ -11,8 +11,6 @@
 #include "User.hpp"
 #include "Channel.hpp"
 
-
-
 class Server {
 private:
 	int socketFd;
@@ -62,9 +60,6 @@ public:
 
 	void createChannel(User *user, std::string name);
 	void showUsers();
-
-
-
 
 };
 #endif //FT_IRC_SERVER_HPP
