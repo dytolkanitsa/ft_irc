@@ -18,7 +18,7 @@ private:
 	std::string password;
 	// bool	enterPassword;
 	// bool	registered;
-	 bool	isOperator;
+	bool	isOperator;
 
 public:
 	User(int socketFd, char *host, int port);

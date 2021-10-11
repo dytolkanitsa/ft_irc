@@ -22,10 +22,6 @@ std::string	User::getHost(void) {
 	return host;
 }
 
-int	User::getPort(void) {
-	return port;
-}
-
 std::string 	User::getMessage(void) {
 	return message;
 }
@@ -56,10 +52,6 @@ void	User::setSocketFd(int sockt) {
 
 void	User::setHost(std::string host) {
 	this->host = host;
-}
-
-void	User::setPort(int port) {
-	this->port = port;
 }
 
 void	User::setRealName(std::string realName) {
