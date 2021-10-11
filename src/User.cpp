@@ -73,3 +73,7 @@ void User::makeOperator() {
 void User::removeOperator() {
 	this->isOperator = false;
 }
+
+void User::messageToUser(std::string msg) {
+	send(this->socketFd, msg.c_str(), msg.length(), 0);
+}

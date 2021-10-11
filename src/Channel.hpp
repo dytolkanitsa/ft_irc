@@ -1,6 +1,8 @@
 #ifndef FT_IRC_CHANNEL_HPP
 #define FT_IRC_CHANNEL_HPP
 
+#include <iostream>
+#include <vector>
 #include "User.hpp"
 
 class Channel
@@ -19,8 +21,9 @@ public:
 
 	bool	ifUserExist(std::string userName);
 	void	setUser(User* user);
-	void	sendMessageToChannel(std::string msg);
+	void sendMessageToChannel(std::string msg, User *sender);
 	void	removeUser(std::string userName);
+
 };
 
 #endif

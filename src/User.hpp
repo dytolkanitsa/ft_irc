@@ -6,14 +6,14 @@
 #define FT_IRC_USER_HPP
 
 #include <iostream>
+#include <sys/socket.h>
+
 
 class User {
 private:
 	int socketFd;
 	std::string nickName;
 	std::string realName;
-	std::string host;
-	int 		port; //todo: uint32_t ?
 	std::string message;
 	std::string password;
 	// bool	enterPassword;
@@ -28,8 +28,6 @@ public:
 
 	std::string 	getNickName(void);
 	int 			getSocketFd(void);
-	std::string 	getHost(void);
-	int				getPort(void);
 	std::string 	getMessage(void);
 	std::string 	getRealName(void);
 	std::string		getPassword();
@@ -40,8 +38,6 @@ public:
 
 	void	setNickName(std::string nickName);
 	void	setSocketFd(int sockt);
-	void	setHost(std::string host);
-	void	setPort(int port);
 	void	setRealName(std::string realName);
 	void 	setMessage(std::string message);
 	void	setPassword(std::string pass);

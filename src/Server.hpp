@@ -39,6 +39,7 @@ public:
 	void commandProcess(User *user);
 //	Command *findCommandByName(std::string commandName); нужна map
 	std::vector<std::string> setArgs(std::string argString);
+
 	void passCommand(std::vector<std::string> *args, User *user);
 	void userCommand(std::vector<std::string> *args, User *user);
 	void nickCommand(std::vector<std::string> *args, User *user);
@@ -46,6 +47,10 @@ public:
 	void privmsgCommand(std::vector<std::string> *args, User *user);
 	void joinCommand(std::vector<std::string> *args, User *user);
 	void namesCommand(std::vector<std::string> *args, User *user);
+
+
+	void createChannel(User *user, std::string name);
+	void showUsers();
 
 
 

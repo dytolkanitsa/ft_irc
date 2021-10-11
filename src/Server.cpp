@@ -8,15 +8,10 @@
 #include <cstring>
 #include <array>
 #include <arpa/inet.h>
-
 #include "Server.hpp"
-//#include "User.hpp"
 
 Server::Server(const std::string *host, const std::string &port, const std::string &password)
 : host(nullptr), port(port), password(password), socketFd(-1) {
-//	commands.push_back(new PrivateMessageCommand(this->users));
-//	commands.push_back(new UserCommand(this->users));
-	//todo: add commands
 }
 
 /**
@@ -36,43 +31,31 @@ void Server::init() {
 	if ((status = getaddrinfo(this->host ? this->host->c_str() : nullptr, this->port.c_str(), &hints, &serverInfo)) != 0) {
 		// TODO: errors
 	}
-
-	/*
-	 * getaddrinfo() returns a list of address structures.
-	 * Try each address until we successfully bind(2).
-	 * If socket(2) (or bind(2)) fails, we (close the socket and) try the next address.
-	*/
-
 	for (rp = serverInfo; rp != nullptr; rp = rp->ai_next) {
 		socketFd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
-
 		if (socketFd == -1) {
 			continue;
 		}
-
 		if (setsockopt(socketFd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
 			// TODO: errors
 		}
-
 		if (bind(socketFd, rp->ai_addr, rp->ai_addrlen) == 0) {
 			break; // Success
 		}
 		close(socketFd);
 	}
 	if (rp == nullptr)  {
-//		fprintf(stderr, "server: failed to bind");
 		exit(1);
 		// todo: bind error
-//		return 2;
 	}
 	freeaddrinfo(serverInfo); // освобождаем связанный список
 	this->socketFd = socketFd;
 }
+
 /**
  * listen сокета, создание pollfd структуры для этого сокета,
  * добавление в вектор структур, и главный цикл
  */
-//_Noreturn
 [[noreturn]] void Server::start() {
 	if (listen(this->socketFd, 10) == -1){//todo: 10 - очередь из соединений
 		exit(1);
@@ -101,7 +84,6 @@ Server::~Server() {
 }
 
 void Server::acceptProcess() {
-//	std::vector<pollfd>::iterator itFds;
 	pollfd nowPollfd;
 
 	for (int i = 0; i < this->fds.size(); i++) {
@@ -110,46 +92,22 @@ void Server::acceptProcess() {
 		if ((nowPollfd.revents & POLLIN) == POLLIN){ ///модно считать данные
 
 			if (nowPollfd.fd == this->socketFd) { ///accept
-				std::cout << "🤔" << std::endl;
 				int clientSocket;
 				sockaddr_in		clientAddr;
 				memset( &clientAddr, 0, sizeof(clientAddr));
 				socklen_t socketLen = sizeof (clientAddr);
-
 				clientSocket = accept(this->socketFd, (sockaddr *) &clientAddr, &socketLen);
 				if (clientSocket == -1) {
-					//todo: error accept
 					continue;
-					/*std::cout << strerror(errno) << std::endl;
-					std::cout << strerror(EAGAIN) << std::endl;
-					std::cout << strerror(EWOULDBLOCK) << std::endl;
-					std::cout << strerror(EBADF) << std::endl;
-					std::cout << strerror(ECONNABORTED) << std::endl;
-					std::cout << strerror(EFAULT) << std::endl;
-					std::cout << strerror(EINTR) << std::endl;
-					std::cout << strerror(EINVAL) << std::endl;
-					std::cout << strerror(EMFILE) << std::endl;
-					std::cout << strerror(ENOBUFS) << std::endl;
-					std::cout << strerror(ENOMEM) << std::endl;
-					std::cout << strerror(ENOTSOCK) << std::endl;
-					std::cout << strerror(EOPNOTSUPP) << std::endl;
-					std::cout << strerror(EPERM) << std::endl;
-					std::cout << strerror(EPROTO) << std::endl;
-					exit(1);*/
 				}
-
 				pollfd clientPollfd {clientSocket, POLLIN, 0};
 				this->fds.push_back(clientPollfd);
-
 				if (fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1) {
-					//todo: fcntl error
 					throw std::runtime_error("fcntl error");
 				}
 				std::cout<< "cs:" << clientSocket << std::endl;
 				std::cout<< "sfd:" << this->socketFd << std::endl;
-				//нужно создать пользователя
 				User *user = new User(clientSocket, inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port));
-				//а теперь добавить его в "массив" пользователей в сервере
 				this->users.push_back(user);
 			}
 			else { ///нужно принять данные не с основного сокета, который мы слушаем(клиентского?)
@@ -157,13 +115,7 @@ void Server::acceptProcess() {
 					std::cout << "fd: " << nowPollfd.fd << std::endl;
 					User * curUser = findUserByFd(nowPollfd.fd);
 					curUser->setMessage(recvMessage(curUser->getSocketFd()));
-					///нуно найти это фдшник юзера или гостя
 					this->commandProcess(curUser);
-					//после этого вся остальная шняга
-//					std::vector<User *>::iterator	itUser = users.begin();
-//					std::advance(itUser, std::distance(fds.begin(), itFds) - 1);
-					//				itUser->getSocketFd();
-//					sendMessage(this->users[i ? i - 1 : 0]);
 				} catch (std::runtime_error & e) {
 					std::cout << e.what() << std::endl;
 				}
@@ -174,8 +126,6 @@ void Server::acceptProcess() {
 	}
 }
 
-
-
 /**
  * функция для получения сообщения и добавления к нему "\r\n"
  * @param user класс пользователя для получения сообщения
@@ -184,42 +134,12 @@ std::string Server::recvMessage(int fd) {
 	char message[100]; /*todo: 100?*/
 	ssize_t recvByte;
 	memset(message, '\0', sizeof(message));
-	recvByte = recv(fd, message, sizeof(message) -2, 0);//потому что + "\r\n"
+	recvByte = recv(fd, message, sizeof(message), 0);
 	if (recvByte <= 0){
-		//todo: error;
-//		throw std::runtime_error("recv < 0");
+		throw std::runtime_error("recv < 0");
 	}
-	message[strlen(message) + 1] = '\r';
-	message[strlen(message) + 2] = '\n';
 	std::cout << "💬 ➡ " << message << " ⬅ 🐢" << std::endl;
 	return (message);
-}
-
-
-
-
-/**
- * функция(временная) для отправки сообщения всем пользователям, кроме него самого
- * @param user класс пользователя, который отправляет сообщение
- */
-void Server::sendMessage(User *user) {
-//	std::string message = user->getMessage();
-//	std::string command = message.substr(0,message.find(' '));
-//	Command *curCommand;
-//	curCommand = this->findCommandByName(command);
-//	curCommand->setArgs(message);
-	std::vector<User *>::iterator	itUser;
-	User *curUser;
-
-	for (itUser = users.begin(); itUser != users.end(); itUser++){
-		curUser = *itUser;
-		/*if (*itUser == user){
-			не отправляем сообщение
-		} else */if (curUser != user){
-			send(curUser->getSocketFd(), user->getMessage().c_str(), user->getMessage().length(), 0);
-//			отправляем
-		}
-	}
 }
 
 /**
@@ -238,21 +158,6 @@ User *Server::findUserByName(std::string userName) { //перейдет в кл�
 	return nullptr;
 }
 
-/**
- * пытается найти команду в векторе команд по ее имени
- * @param commandName имя команды
- * @return указатель на класс нужной команды или nullptr
- */
-/*Command *Server::findCommandByName(std::string commandName) {
-	std::vector<Command *>::iterator it; //итератор по вектору команд
-	for(it = this->commands.begin(); it != this->commands.end(); it++){
-		Command *curCommand = *it;
-		if (curCommand->getName() == commandName){
-			return *it;
-		}
-	}
-	return nullptr;
-}*/
 /**
 * разделяет строку по пробелам и возвращает полученный массив, заранее отделяя агрумент после ':'
 * @param argString строка-сообщение
@@ -419,15 +324,14 @@ void Server::privmsgCommand(std::vector<std::string> *args, User *user) {
 		for (int i = 1; i < receivers.size(); i++){
 			User *recipientUser = this->findUserByName(receivers.at(i));
 			if (recipientUser != nullptr){
-				//отправить сообщение юзеру
+				recipientUser->messageToUser(args->at(args->size() -1));
 			} else{
 				Channel *channel = this->findChannelByName(receivers.at(i));
-				//отправить сообщение в канал
 				if (channel == nullptr){
 					throw std::runtime_error("Wrong receiver");
 				}
+				channel->sendMessageToChannel(args->at(args->size() -1), user);
 			}
-
 		}
 	}
 }
@@ -440,9 +344,9 @@ void Server::joinCommand(std::vector<std::string> *args, User *user) {
 	for (int i = 1; i < channelsForJoin.size(); i++){
 		Channel *channel = findChannelByName(channelsForJoin[i]);
 		if (channel == nullptr){
-			//создать канал
+			createChannel(user, channelsForJoin[i]);
 		} else {
-			//отправить сообщение на канал
+			channel->sendMessageToChannel(args->at(args->size() - 1), user);
 		}
 	}
 }
@@ -460,11 +364,21 @@ void Server::namesCommand(std::vector<std::string> *args, User *user) {
 			}
 		}
 	}
-
 }
 
+/**
+ * создает канал, добавляет его в вектор каналов и добавляет создавшего юзера в этот канал
+ * @param user пользователь создавший канал
+ * @param name имя канала
+ */
+void Server::createChannel(User *user, std::string name) {
+	Channel *channel = new Channel(name);
+	channels.push_back(channel);
+	channel->setUser(user);// todo: сделат оператором
+}
 
+void Server::showUsers() {
 
-
+}
 
 //throw std::runtime_error("Wrong count of args: ");
