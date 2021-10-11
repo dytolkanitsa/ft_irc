@@ -33,20 +33,31 @@ public:
 	void acceptProcess();
 	std::string recvMessage(int fd);
 	void sendMessage(User * user);
-	User *findUserByName(std::string userName);
+	User *findUserByName(const std::string & userName) const;
 	User *findUserByFd(int fd);
 	Channel *findChannelByName(std::string channelName);
-	void commandProcess(User *user);
+	void commandProcess(User & user, const std::string & message);
 //	Command *findCommandByName(std::string commandName); нужна map
 	std::vector<std::string> setArgs(std::string argString);
 
-	void passCommand(std::vector<std::string> *args, User *user);
-	void userCommand(std::vector<std::string> *args, User *user);
-	void nickCommand(std::vector<std::string> *args, User *user);
-	void operCommand(std::vector<std::string> *args, User *user);
-	void privmsgCommand(std::vector<std::string> *args, User *user);
-	void joinCommand(std::vector<std::string> *args, User *user);
-	void namesCommand(std::vector<std::string> *args, User *user);
+	// Errors
+	std::string constructError(const std::string & code,
+							   const std::string & message,
+							   const std::string & nick,
+							   const std::string & secondParam) const;
+	std::runtime_error alreadyRegistered(const std::string & nick) const;
+	std::runtime_error needMoreParams(const std::string & nick, const std::string & command) const;
+	std::runtime_error passMismatch(const std::string & nick) const;
+	std::runtime_error nickInUse(const std::string &nick, const std::string &newNick) const;
+	std::runtime_error connectionRestricted(const std::string &nick) const;
+
+	// Commands
+	void passCommand(std::vector<std::string> & args, User & user) const;
+	void userCommand(std::vector<std::string> & args, User & user) const;
+	void nickCommand(std::vector<std::string> & args, User & user) const;
+	void privmsgCommand(std::vector<std::string> & args, User & user);
+	void joinCommand(std::vector<std::string> & args, User & user);
+	void namesCommand(std::vector<std::string> & args, User & user);
 
 
 	void createChannel(User *user, std::string name);

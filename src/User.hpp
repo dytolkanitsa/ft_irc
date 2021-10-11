@@ -16,25 +16,25 @@ private:
 	std::string realName;
 	std::string message;
 	std::string password;
-	// bool	enterPassword;
-	// bool	registered;
-	 bool	isOperator;
+	bool	enterPassword;
+	bool	registered;
+	bool	isOperator;
 
 public:
-	User(int socketFd, char *host, int port);
+	explicit User(int socketFd);
 	virtual ~User();
 
-	void	messageToUser(std::string msg);
+	void	messageToUser(const std::string & msg) const;
 
-	std::string 	getNickName(void);
-	int 			getSocketFd(void);
-	std::string 	getMessage(void);
-	std::string 	getRealName(void);
+	std::string 	getNickName();
+	int 			getSocketFd();
+	std::string 	getMessage();
+	std::string 	getRealName();
 	std::string		getPassword();
 
-	// bool	getEnterPassword(void) {return enterPassword;} // 7
-	// bool	getRegistered(void) {return registered;} // 8
-	// bool	getIsOperator(void) {return isOperator;} // 9
+	 bool	getEnterPassword() const {return enterPassword;} // 7
+	 bool	getRegistered() const {return registered;} // 8
+	 bool	getIsOperator() const {return isOperator;} // 9
 
 	void	setNickName(std::string nickName);
 	void	setSocketFd(int sockt);
@@ -43,9 +43,9 @@ public:
 	void	setPassword(std::string pass);
 	void 	makeOperator();
 	void 	removeOperator();
-	// void	setEnterPassword(bool param) {return enterPassword = param;} // 7
-	// void	setRegistered(bool param) {return registered = param;} // 8
-	// void	setIsOperator(bool param) {return isOperato = param;} // 9
+	 void	setEnterPassword(bool param) {enterPassword = param;} // 7
+	 void	setRegistered(bool param) {registered = param;} // 8
+	 void	setIsOperator(bool param) {isOperator = param;} // 9
 
 };
 
