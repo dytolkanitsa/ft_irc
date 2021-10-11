@@ -46,8 +46,8 @@ void Channel::sendMessageToChannel(std::string msg, User *sender) {
 }
 
 //не знаю почему, но не видит поля с юзерами
-/*
-void	removeUser(std::string userName) {
+
+void	 Channel::removeUser(std::string userName) {
 	// int found = 0; пусть пока побудет
 	for (std::vector<User *>::const_iterator i = users.begin(); i != users.end(); i++)
 	{
@@ -57,4 +57,4 @@ void	removeUser(std::string userName) {
 	}
 	// erase удаляет из вектора диапазон элементов начиная с found знакачивая длиной строки
 	this->users.erase(users.begin() + i);
-}*/
+}
