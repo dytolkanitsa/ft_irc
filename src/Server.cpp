@@ -341,7 +341,7 @@ void Server::privmsgCommand(std::vector<std::string> & args, User & user) {
 	}
 }
 
-void	Server::noticeCommand(std::vector<std::string> & args, User & user)
+void	Server::noticeCommand(std::vector<std::string> & args, User & user) {
 	if (!user.getRegistered()) {
 		throw connectionRestricted(user.getNickName());
 	}
