@@ -332,7 +332,7 @@ void Server::privmsgCommand(std::vector<std::string> & args, User & user) {
 					throw std::runtime_error("Wrong receiver");
 				}
 				channel->sendMessageToChannel(args.at(args.size() -1), &user);
-				if (channel->getAwayMessage.empty())
+				if (!channel->getAwayMessage.empty())
 				{
 					// выикнуть юзеру сообщение эвэйноеч
 				}
@@ -403,7 +403,7 @@ void Server::namesCommand(std::vector<std::string> & args, User & user) {
 	}
 }
 
-//list kick notice
+//list kick notice (выше) away
 void	Server::listCommand(std::vector<std::string> & args, User & user)
 {
 	if (!user.getRegistered()) {
@@ -425,6 +425,18 @@ void	Server::kickCommand(std::vector<std::string> & args, User & user)
 		throw connectionRestricted(user.getNickName());
 }
 
+void Server::awayCommand(std::vector<std::string> & args, User & user) {
+	if (!user.getRegistered()) {
+		throw connectionRestricted(user.getNickName());
+	else {
+		if (args.size() == 1) {
+			std::string awayMessage = args[0]; // там же текст
+			user.setAwayMessage(awayMessage);
+			user.messageToUser(":You have been marked as being away") // 306 ошибка
+		}
+		else
+			throw needMoreParams(user.getNickName(), "AWAY");
+}
 /**
  * создает канал, добавляет его в вектор каналов и добавляет создавшего юзера в этот канал, а так же добавляет канал юзеру в вектор
  * @param user пользователь создавший канал
