@@ -30,9 +30,9 @@ public:
 	std::string 	getRealName();
 	std::string		getPassword();
 
-	 bool	getEnterPassword() const {return enterPassword;} // 7
-	 bool	getRegistered() const {return registered;} // 8
-	 bool	getIsOperator() const {return isOperator;} // 9
+	bool	getEnterPassword() const {return enterPassword;} // 7
+	bool	getRegistered() const {return registered;} // 8
+	bool	getIsOperator() const {return isOperator;} // 9
 
 	void	setNickName(const std::string & nickName);
 	void	setSocketFd(int socket);
@@ -40,9 +40,9 @@ public:
 	void	setPassword(const std::string & pass);
 	void 	makeOperator();
 	void 	removeOperator();
-	 void	setEnterPassword(bool param) {enterPassword = param;} // 7
-	 void	setRegistered(bool param) {registered = param;} // 8
-	 void	setIsOperator(bool param) {isOperator = param;} // 9
+	void	setEnterPassword(bool param) {enterPassword = param;} // 7
+	void	setRegistered(bool param) {registered = param;} // 8
+	void	setIsOperator(bool param) {isOperator = param;} // 9
 
 };
 

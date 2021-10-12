@@ -246,11 +246,11 @@ void Server::commandProcess(User & user, const std::string & message) {
 		else if (command == "QUIT"){}
 		else if (args[0] == "JOIN"){}
 		else if (args[0] == "PART"){}
-		else if (args[0] == "MODE"){}
+		// else if (args[0] == "MODE"){}
 		else if (args[0] == "NAMES"){}
 		else if (args[0] == "LIST"){}
 		else if (args[0] == "KICK"){}
-		else if (args[0] == "ADMIN"){}
+		// else if (args[0] == "ADMIN"){}
 		else if (args[0] == "NOTICE"){}
 	} catch (std::runtime_error & error) {
 		user.messageToUser(error.what());
@@ -367,6 +367,22 @@ void Server::namesCommand(std::vector<std::string> & args, User & user) {
 			}
 		}
 	}
+}
+
+//list kick notice
+void	Server::listCommand(std::vector<std::string> & args, User & user)
+{
+
+}
+
+void	Server::kickCommand(std::vector<std::string> & args, User & user)
+{
+
+}
+
+void	Server::noticeCommand(std::vector<std::string> & args, User & user)
+{
+
 }
 
 /**
