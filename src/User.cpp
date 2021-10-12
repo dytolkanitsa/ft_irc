@@ -61,6 +61,6 @@ void	User::setAwayMessage(std::string	message) {
 	awayMessage = message;
 }
 
-void	User::getAwayMessage(std::string	message) {
+std::string	User::getAwayMessage(std::string	message) {
 	return awayMessage;
 }
