@@ -6,8 +6,9 @@
 #define FT_IRC_USER_HPP
 
 #include <iostream>
+#include <vector>
 #include <sys/socket.h>
-
+#include "Channel.hpp"
 
 class User {
 private:
@@ -18,6 +19,7 @@ private:
 	bool	enterPassword;
 	bool	registered;
 	bool	isOperator;
+	std::vector<Channel *> channels;
 
 public:
 	User(int socketFd);
@@ -44,6 +46,7 @@ public:
 	 void	setRegistered(bool param) {registered = param;} // 8
 	 void	setIsOperator(bool param) {isOperator = param;} // 9
 
+	 void addChannel(Channel *channel);
 };
 
 

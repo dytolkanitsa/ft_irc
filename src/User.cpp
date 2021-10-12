@@ -52,3 +52,7 @@ void User::removeOperator() {
 void User::messageToUser(const std::string & msg) const {
 	send(this->socketFd, msg.c_str(), msg.length(), 0);
 }
+
+void User::addChannel(Channel *channel) {
+	this->channels.push_back(channel);
+}

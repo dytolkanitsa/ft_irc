@@ -244,7 +244,9 @@ void Server::commandProcess(User & user, const std::string & message) {
 			this->privmsgCommand(args, user);
 		}
 		else if (command == "QUIT"){}
-		else if (args[0] == "JOIN"){}
+		else if (args[0] == "JOIN"){
+			this->joinCommand(args, user);
+		}
 		else if (args[0] == "PART"){}
 		else if (args[0] == "MODE"){}
 		else if (args[0] == "NAMES"){}
@@ -343,7 +345,9 @@ void Server::joinCommand(std::vector<std::string> & args, User & user) {
 		if (channel == nullptr){
 			createChannel(&user, channelsForJoin[i]);
 		} else {
-			channel->sendMessageToChannel(args.at(args.size() - 1), &user);
+			user.addChannel(channel);
+			//todo: message about join
+//			channel->sendMessageToChannel(args.at(args.size() - 1), &user);
 		}
 	}
 }
@@ -367,13 +371,14 @@ void Server::namesCommand(std::vector<std::string> & args, User & user) {
 }
 
 /**
- * создает канал, добавляет его в вектор каналов и добавляет создавшего юзера в этот канал
+ * создает канал, добавляет его в вектор каналов и добавляет создавшего юзера в этот канал, а так же добавляет канал юзеру в вектор
  * @param user пользователь создавший канал
  * @param name имя канала
  */
 void Server::createChannel(User *user, std::string name) {
 	Channel *channel = new Channel(name);
 	channels.push_back(channel);
+	user->addChannel(channel);
 	channel->setUser(user);// todo: сделат оператором
 }
 
