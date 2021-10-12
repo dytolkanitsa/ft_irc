@@ -21,7 +21,7 @@ public:
 
 	bool	ifUserExist(std::string userName);
 	void	setUser(User* user);
-	void sendMessageToChannel(std::string msg, User *sender);
+	void	sendMessageToChannel(std::string msg, User *sender);
 	void	removeUser(std::string userName);
 
 };

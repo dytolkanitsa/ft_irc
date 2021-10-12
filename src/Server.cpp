@@ -254,6 +254,7 @@ void Server::commandProcess(User & user, const std::string & message) {
 		else if (args[0] == "KICK"){}
 		// else if (args[0] == "ADMIN"){}
 		else if (args[0] == "NOTICE"){}
+		else if (args[0] == "AWAY"){}
 	} catch (std::runtime_error & error) {
 		user.messageToUser(error.what());
 	}
@@ -311,7 +312,36 @@ std::vector<std::string> getReceivers(const std::string& receivers){ //todo: н�
 	return result;
 }
 
+// надо доделать с учетом AWAY
 void Server::privmsgCommand(std::vector<std::string> & args, User & user) {
+	if (!user.getRegistered()) {
+		throw connectionRestricted(user.getNickName());
+	}
+	if (args.size() != 3) {
+		throw needMoreParams(user.getNickName(), "PRIVMSG");
+	}
+	else {
+		std::vector<std::string> receivers = getReceivers(args[1]);
+		for (int i = 0; i < receivers.size(); i++) {
+			User *recipientUser = this->findUserByName(receivers.at(i));
+			if (recipientUser != nullptr){
+				recipientUser->messageToUser(args[args.size() -1]);
+			} else{
+				Channel *channel = this->findChannelByName(receivers.at(i));
+				if (channel == nullptr){
+					throw std::runtime_error("Wrong receiver");
+				}
+				channel->sendMessageToChannel(args.at(args.size() -1), &user);
+				if (channel->getAwayMessage.empty())
+				{
+					// выикнуть юзеру сообщение эвэйноеч
+				}
+			}
+		}
+	}
+}
+
+void	Server::noticeCommand(std::vector<std::string> & args, User & user)
 	if (!user.getRegistered()) {
 		throw connectionRestricted(user.getNickName());
 	}
@@ -376,17 +406,23 @@ void Server::namesCommand(std::vector<std::string> & args, User & user) {
 //list kick notice
 void	Server::listCommand(std::vector<std::string> & args, User & user)
 {
-
+	if (!user.getRegistered()) {
+		throw connectionRestricted(user.getNickName());
+	if (args.empty()) {
+		throw needMoreParams(user.getNickName(), "LIST");
+	}
+	std::vector<Channel *> channels_ =  this->getChannels();
+	for (std::vector<Channel *>::const_iterator i = channels_.begin(); i != channels_.end(); i++)
+	{
+		user.messageToUser((*i)->getChannelName())
+	}
+	user.messageToUser("End of LIST\r\n"); // 323* :End of LIST ???
 }
 
 void	Server::kickCommand(std::vector<std::string> & args, User & user)
 {
-
-}
-
-void	Server::noticeCommand(std::vector<std::string> & args, User & user)
-{
-
+	if (!user.getRegistered()) {
+		throw connectionRestricted(user.getNickName());
 }
 
 /**
@@ -403,6 +439,11 @@ void Server::createChannel(User *user, std::string name) {
 
 void Server::showUsers() {
 
+}
+
+std::vector<Channel *> Server::getChannels()
+{
+	return channels;
 }
 
 std::string Server::constructError(const std::string & code,

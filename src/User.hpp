@@ -16,6 +16,7 @@ private:
 	std::string nickName;
 	std::string realName;
 	std::string password;
+	std::string	awayMessage;
 	bool	enterPassword;
 	bool	registered;
 	bool	isOperator;
@@ -46,7 +47,10 @@ public:
 	void	setRegistered(bool param) {registered = param;} // 8
 	void	setIsOperator(bool param) {isOperator = param;} // 9
 
-	 void addChannel(Channel *channel);
+	void	addChannel(Channel *channel);
+
+	void	setAwayMessage(std::string	message);
+	void	getAwayMessage(std::string	message);
 };
 
 

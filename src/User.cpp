@@ -56,3 +56,11 @@ void User::messageToUser(const std::string & msg) const {
 void User::addChannel(Channel *channel) {
 	this->channels.push_back(channel);
 }
+
+void	setAwayMessage(std::string	message) {
+	awayMessage = message;
+}
+
+void	getAwayMessage(std::string	message) {
+	return awayMessage;
+}

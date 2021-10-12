@@ -59,5 +59,7 @@ public:
 
 	void createChannel(User *user, std::string name);
 	void showUsers();
+	
+	std::vector<Channel *> getChannels();
 };
 #endif //FT_IRC_SERVER_HPP
