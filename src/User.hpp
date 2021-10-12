@@ -8,7 +8,10 @@
 #include <iostream>
 #include <vector>
 #include <sys/socket.h>
-#include "Channel.hpp"
+//#include "Channel.hpp"
+
+class Channel;
+
 
 class User {
 private:
@@ -25,10 +28,10 @@ public:
 	User(int socketFd);
 	virtual ~User();
 
-	void	messageToUser(const std::string & msg) const;
+	void	messageToUser(const std::string & msg)/* const*/;
 
-	std::string 	getNickName() const;
-	int 			getSocketFd() const;
+	std::string 	getNickName() /*const*/;
+	int 			getSocketFd() /*const*/;
 	std::string 	getRealName();
 	std::string		getPassword();
 
@@ -47,6 +50,7 @@ public:
 	 void	setIsOperator(bool param) {isOperator = param;} // 9
 
 	 void addChannel(Channel *channel);
+	 void leaveAllChannels();
 };
 
 

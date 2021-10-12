@@ -6,10 +6,14 @@
 #define FT_IRC_SERVER_HPP
 
 #include <string>
+#include <iostream>
 #include <sys/poll.h>
 #include <vector>
-#include "User.hpp"
-#include "Channel.hpp"
+//#include "User.hpp"
+//#include "Channel.hpp"
+
+class User;
+class Channel;
 
 class Server {
 private:
@@ -59,5 +63,6 @@ public:
 
 	void createChannel(User *user, std::string name);
 	void showUsers();
+	void removeUser(User *user);
 };
 #endif //FT_IRC_SERVER_HPP

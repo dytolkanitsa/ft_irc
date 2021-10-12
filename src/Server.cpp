@@ -9,6 +9,11 @@
 #include <array>
 #include <arpa/inet.h>
 #include "Server.hpp"
+#include "User.hpp"
+#include "Channel.hpp"
+
+#define GREEN "\033[32m"
+#define STD "\033[0m"
 
 Server::Server(const std::string *host, const std::string &port, const std::string &password)
 : host(nullptr), port(port), password(password), socketFd(-1) {
@@ -120,7 +125,15 @@ void Server::acceptProcess() {
 				}
 			}
 		}
-		else if ((nowPollfd.revents & POLLHUP) == POLLHUP){ ///кто-то оборвал соединение
+		if ((nowPollfd.revents & POLLHUP) == POLLHUP){ ///кто-то оборвал соединение
+			std::cout <<GREEN  "psjslifskfjklsdfjsld" STD<<std::endl;
+			User *user = findUserByFd(nowPollfd.fd);
+			if (user == nullptr){
+				continue; // я вот вообще честно говоря вообще не знаю, когда такое может произойти
+			}
+			this->removeUser(user);
+			this->fds.erase(fds.begin() + i);
+			exit(100);
 		}
 	}
 }
@@ -414,4 +427,14 @@ std::runtime_error Server::nickInUse(const std::string & nick, const std::string
 
 std::runtime_error Server::connectionRestricted(const std::string &nick) const {
 	return std::runtime_error(constructError("484", "Your connection is restricted!", nick));
+}
+
+void Server::removeUser(User *user) {
+	for(int i = 0; i != this->users.size(); i++){
+		if (user == users[i]){
+			users[i]->leaveAllChannels();
+			users.erase(users.begin() + i);
+			break;
+		}
+	}
 }

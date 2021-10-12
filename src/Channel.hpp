@@ -3,12 +3,14 @@
 
 #include <iostream>
 #include <vector>
-#include "User.hpp"
+//#include "User.hpp"
+
+class User;
 
 class Channel
 {
 private:
-	std::vector<User *> users;
+	std::vector <User *> users;
 	std::string			channelName;
 
 public:
