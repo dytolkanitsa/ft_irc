@@ -132,6 +132,7 @@ void Server::acceptProcess() {
 				continue; // я вот вообще честно говоря вообще не знаю, когда такое может произойти
 			}
 			this->removeUser(user);
+			close(fds[i].fd);
 			this->fds.erase(fds.begin() + i);
 			exit(100);
 		}
