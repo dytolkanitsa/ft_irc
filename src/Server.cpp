@@ -267,6 +267,7 @@ void Server::passCommand(std::vector<std::string> & args, User & user) const {
 	if (args[0] != this->password) {
 		throw passMismatch(user.getNickName());
 	}
+	user.setEnterPassword(true);
 }
 
 void Server::userCommand(std::vector<std::string> & args, User & user) const {
@@ -285,6 +286,8 @@ void Server::nickCommand(std::vector<std::string> & args, User & user) const {
 	if (findUserByName(args[0])) {
 		throw nickInUse(user.getNickName(), args[0]);
 	}
+	user.setNickName(args[0]);
+	user.messageToUser(":" + prevNick + " NICK " + user.getNickName() + "\r\n");
 }
 
 /**
