@@ -243,18 +243,26 @@ void Server::commandProcess(User & user, const std::string & message) {
 		else if (command == "PRIVMSG") {
 			this->privmsgCommand(args, user);
 		}
-		else if (command == "QUIT"){}
 		else if (args[0] == "JOIN"){
 			this->joinCommand(args, user);
 		}
+		else if (args[0] == "LIST"){
+			this->listCommand(args, user);
+		}
+		else if (args[0] == "NOTICE"){
+			this->noticeCommand(args, user);
+		}
+		else if (args[0] == "AWAY"){
+			this->awayCommand(args, user);
+		}
+		else if (args[0] == "NAMES"){
+			this->namesCommand(args, user);
+		}
+		else if (command == "QUIT"){}
 		else if (args[0] == "PART"){}
 		// else if (args[0] == "MODE"){}
-		else if (args[0] == "NAMES"){}
-		else if (args[0] == "LIST"){}
 		else if (args[0] == "KICK"){}
 		// else if (args[0] == "ADMIN"){}
-		else if (args[0] == "NOTICE"){}
-		else if (args[0] == "AWAY"){}
 	} catch (std::runtime_error & error) {
 		user.messageToUser(error.what());
 	}
