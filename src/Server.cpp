@@ -312,7 +312,10 @@ std::vector<std::string> getReceivers(const std::string& receivers){ //todo: н�
 	return result;
 }
 
-// надо доделать с учетом AWAY
+/*
+пересылает сообщения в канал или юзеру, если у юзера стоит away message, то юзер автоматически
+получает его в качестве ответа
+*/
 void Server::privmsgCommand(std::vector<std::string> & args, User & user) {
 	if (!user.getRegistered()) {
 		throw connectionRestricted(user.getNickName());
@@ -345,7 +348,7 @@ void	Server::noticeCommand(std::vector<std::string> & args, User & user) {
 		throw connectionRestricted(user.getNickName());
 	}
 	if (args.size() != 3) {
-		throw needMoreParams(user.getNickName(), "PRIVMSG");
+		throw needMoreParams(user.getNickName(), "NOTICE");
 	}
 	else {
 		std::vector<std::string> receivers = getReceivers(args[1]);
@@ -402,7 +405,9 @@ void Server::namesCommand(std::vector<std::string> & args, User & user) {
 	}
 }
 
-//list kick notice (выше) away
+/*
+выводит список каналов на сервере (и их топиков, но мы это опустим)
+*/
 void	Server::listCommand(std::vector<std::string> & args, User & user)
 {
 	if (!user.getRegistered()) {
@@ -418,6 +423,10 @@ void	Server::listCommand(std::vector<std::string> & args, User & user)
 	user.messageToUser("End of LIST\r\n"); // 323* :End of LIST ???
 }
 
+/*
+!НЕ СДЕЛАН
+кикает пользователя с канала
+*/
 void	Server::kickCommand(std::vector<std::string> & args, User & user)
 {
 	if (!user.getRegistered()) {
