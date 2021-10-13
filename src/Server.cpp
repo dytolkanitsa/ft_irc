@@ -326,16 +326,15 @@ void Server::privmsgCommand(std::vector<std::string> & args, User & user) {
 			User *recipientUser = this->findUserByName(receivers.at(i));
 			if (recipientUser != nullptr){
 				recipientUser->messageToUser(args[args.size() -1]);
+			if (recipientUser->getAwayMessage().size()!= 0) { //away message
+				throw std::runtime_error(recipientUser->getAwayMessage()); // выкидываем юзеру away message другого юзера
+			}
 			} else{
 				Channel *channel = this->findChannelByName(receivers.at(i));
 				if (channel == nullptr){
 					throw std::runtime_error("Wrong receiver");
 				}
 				channel->sendMessageToChannel(args.at(args.size() -1), &user);
-				if (!channel->getAwayMessage.empty())
-				{
-					// выикнуть юзеру сообщение эвэйноеч
-				}
 			}
 		}
 	}
@@ -425,6 +424,12 @@ void	Server::kickCommand(std::vector<std::string> & args, User & user)
 		throw connectionRestricted(user.getNickName());
 }
 
+/*
+функция устанавливапет, что у юзера есть эвэй сообщение, которое будет автоматически
+отсылаться любому другому юзеру, который ему напишет, в этой функции мы только его устанавливаем
+и когда установили, пишем, что You have been marked as being away, реализация этой системы в 
+привмсг
+*/
 void Server::awayCommand(std::vector<std::string> & args, User & user) {
 	if (!user.getRegistered()) {
 		throw connectionRestricted(user.getNickName());
