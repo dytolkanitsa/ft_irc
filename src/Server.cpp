@@ -142,7 +142,7 @@ void Server::acceptProcess() {
  * @param user класс пользователя для получения сообщения
  */
 std::string Server::recvMessage(int fd) {
-	char message[100]; /*todo: 100?*/
+	char message[512];
 	ssize_t recvByte;
 	memset(message, '\0', sizeof(message));
 	recvByte = recv(fd, message, sizeof(message), 0);
@@ -178,17 +178,17 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 	std::string lastArg;
 	size_t pos = 0;
 	size_t newPos = 0;
-	unsigned long space_skip = argString.length() -3;
+	unsigned long spaceSkip = argString.length() - 3;
 
 	newPos = argString.find("\r\n");
 	if (newPos != std::string::npos){
 		argString = argString.substr(0, newPos);
 	}
-	while(argString[space_skip] == ' ' && space_skip != 0){
-		space_skip--;
+	while(argString[spaceSkip] == ' ' && spaceSkip != 0){
+		spaceSkip--;
 	}
-	if (space_skip != 0){
-		argString = argString.substr(0, space_skip + 1);
+	if (spaceSkip != 0){
+		argString = argString.substr(0, spaceSkip + 1);
 	}
 	newPos = argString.find(':', 0);
 	if (newPos != std::string::npos){
@@ -196,7 +196,7 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 		argString.erase(newPos);
 	}
 	int i;
-	for (i = 0; i < 6; i++){ //todo: 6?
+	for (i = 0;; i++){
 		newPos = argString.find(' ', pos);
 		if (newPos == std::string::npos)
 		{
@@ -204,8 +204,12 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 			break;
 		}
 		args.push_back(argString.substr(pos, newPos - pos));
+		while(argString[newPos + 1] && argString[newPos + 1] == ' '){
+			newPos++;
+		}
 		pos = newPos + 1;
 	}
+//		args.push_back(argString.substr(pos));
 	if (!lastArg.empty())
 		args[i] = lastArg;
 	return args;
@@ -326,10 +330,18 @@ void Server::nickCommand(std::vector<std::string> & args, User & user) const {
  * @param receivers срока, которую нужно разбить
  * @return
  */
-std::vector<std::string> getReceivers(const std::string& receivers){ //todo: не тестировала
+std::vector<std::string> getReceivers(std::string receivers){
 	std::vector<std::string> result;
 	size_t pos = 0;
 	size_t newPos = 0;
+	unsigned long spaceSkip = receivers.length();
+
+	while(receivers[spaceSkip] == ' ' && spaceSkip != 0){
+		spaceSkip--;
+	}
+	if (spaceSkip != 0){
+		receivers = receivers.substr(0, spaceSkip + 1);
+	}
 
 	for (int i = 0; newPos != std::string::npos; i++){
 		newPos = receivers.find(',', pos);
@@ -423,7 +435,7 @@ void Server::namesCommand(std::vector<std::string> & args, User & user) {
 	if (!user.getRegistered()) {
 		throw connectionRestricted(user.getNickName());
 	}
-	if (args.size() != 1) { //todo: 1!?
+	if (args.empty()) {
 		throw needMoreParams(user.getNickName(), "NAMES");
 	}
 	if (args.size() > 1) {
