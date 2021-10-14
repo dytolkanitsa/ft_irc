@@ -546,6 +546,6 @@ std::string Server::awayMessageHaveBeenUnset(const std::string &nick) const {
     return constructError("306", "You are no longer marked as being away", nick);
 }
 
-std::runtime_error Server::NoRecipientGiven(const std::string &nick) const {
-    return std::runtime_error(constructError("411", ":No recipient given ", nick));
+std::string Server::NoRecipientGiven(const std::string &nick) const {
+    return constructError("411", ":No recipient given ", nick);
 }

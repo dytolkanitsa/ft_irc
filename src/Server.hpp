@@ -54,7 +54,7 @@ public:
 	std::runtime_error connectionRestricted(const std::string &nick) const;
     std::runtime_error awayMessageHaveBeenSet(const std::string &nick) const;
     std::string awayMessageHaveBeenUnset(const std::string &nick) const;
-    std::runtime_error NoRecipientGiven(const std::string &nick) const;
+    std::string NoRecipientGiven(const std::string &nick) const;
 
 	// Commands
 	void passCommand(std::vector<std::string> & args, User & user) const;
