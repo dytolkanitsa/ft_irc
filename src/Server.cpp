@@ -278,7 +278,7 @@ void Server::commandProcess(User & user, const std::string & message) {
 		else if (args[0] == "KICK"){}
 		// else if (args[0] == "ADMIN"){}
 	} catch (std::runtime_error & error) {
-		user.messageToUser(error.what());
+		user.sendMessage(error.what());
 	}
 }
 
@@ -310,7 +310,7 @@ void Server::nickCommand(std::vector<std::string> & args, User & user) const {
 		throw nickInUse(user.getNickName(), args[0]);
 	}
 	user.setNickName(args[0]);
-	user.messageToUser(":" + prevNick + " NICK " + user.getNickName() + "\r\n");
+	user.sendMessage(":" + prevNick + " NICK " + user.getNickName() + "\r\n");
 }
 
 /**
@@ -350,7 +350,7 @@ void Server::privmsgCommand(std::vector<std::string> & args, User & user) {
 		for (int i = 0; i < receivers.size(); i++) {
 			User *recipientUser = this->findUserByName(receivers.at(i));
 			if (recipientUser != nullptr){
-				recipientUser->messageToUser(args[args.size() -1]);
+				recipientUser->sendMessage(args[args.size() - 1]);
 			if (recipientUser->getAwayMessage().size()!= 0) { //away message
 				throw std::runtime_error(recipientUser->getAwayMessage()); // выкидываем юзеру away message другого юзера
 			}
@@ -377,7 +377,7 @@ void	Server::noticeCommand(std::vector<std::string> & args, User & user) {
 		for (int i = 0; i < receivers.size(); i++) {
 			User *recipientUser = this->findUserByName(receivers.at(i));
 			if (recipientUser != nullptr){
-				recipientUser->messageToUser(args[args.size() -1]);
+				recipientUser->sendMessage(args[args.size() - 1]);
 			} else{
 				Channel *channel = this->findChannelByName(receivers.at(i));
 				if (channel == nullptr){
@@ -440,9 +440,9 @@ void	Server::listCommand(std::vector<std::string> & args, User & user)
 		std::vector<Channel *> channels_ =  this->getChannels();
 		for (std::vector<Channel *>::const_iterator i = channels_.begin(); i != channels_.end(); i++)
 		{
-			user.messageToUser((*i)->getChannelName());
+			user.sendMessage((*i)->getChannelName());
 		}
-		user.messageToUser("End of LIST\r\n"); // 323* :End of LIST ???
+		user.sendMessage("End of LIST\r\n"); // 323* :End of LIST ???
 	}
 }
 
@@ -460,7 +460,7 @@ void Server::awayCommand(std::vector<std::string> & args, User & user) {
 		if (args.size() == 1) {
 			std::string awayMessage = args[0]; // там же текст
 			user.setAwayMessage(awayMessage);
-			//			user.messageToUser(":You have been marked as being away") // 306 ошибка
+			//			user.sendMessage(":You have been marked as being away") // 306 ошибка
 			throw awayMessageHaveBeenSet(user.getNickName());
 		}
 		else

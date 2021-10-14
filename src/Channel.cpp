@@ -45,7 +45,7 @@ void Channel::sendMessageToChannel(std::string msg, User *sender) {
 	for (i = users.begin(); i != users.end(); i++)
 	{
 		if (*i != sender)
-			(*i)->messageToUser(msg);
+			(*i)->sendMessage(msg);
 	}
 }
 
