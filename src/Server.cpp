@@ -352,12 +352,14 @@ void Server::privmsgCommand(std::vector<std::string> & args, User & user) {
 			if (recipientUser != nullptr){
 				recipientUser->messageToUser(args[args.size() -1]);
 			if (recipientUser->getAwayMessage().size()!= 0) { //away message
-				throw std::runtime_error(recipientUser->getAwayMessage()); // выкидываем юзеру away message другого юзера
+//				throw std::runtime_error(recipientUser->getAwayMessage()); // выкидываем юзеру away message другого юзера
+                user.messageToUser(recipientUser->getAwayMessage()); // стало
 			}
 			} else{
 				Channel *channel = this->findChannelByName(receivers.at(i));
 				if (channel == nullptr){
-					throw std::runtime_error("Wrong receiver");
+//					throw std::runtime_error("Wrong receiver"); было
+                    throw   NoRecipientGiven(user.getNickName()); // стало
 				}
 				channel->sendMessageToChannel(args.at(args.size() -1), &user);
 			}
@@ -433,17 +435,17 @@ void Server::namesCommand(std::vector<std::string> & args, User & user) {
 void	Server::listCommand(std::vector<std::string> & args, User & user)
 {
 	if (!user.getRegistered()) {
-		throw connectionRestricted(user.getNickName());
-		if (args.empty()) {
-			throw needMoreParams(user.getNickName(), "LIST");
-		}
-		std::vector<Channel *> channels_ =  this->getChannels();
-		for (std::vector<Channel *>::const_iterator i = channels_.begin(); i != channels_.end(); i++)
-		{
-			user.messageToUser((*i)->getChannelName());
-		}
-		user.messageToUser("End of LIST\r\n"); // 323* :End of LIST ???
-	}
+        throw connectionRestricted(user.getNickName());
+        }
+    if (args.empty()) {
+        throw needMoreParams(user.getNickName(), "LIST");
+    }
+    std::vector<Channel *> channels_ =  this->getChannels();
+    for (std::vector<Channel *>::const_iterator i = channels_.begin(); i != channels_.end(); i++)
+    {
+        user.messageToUser((*i)->getChannelName());
+    }
+    user.messageToUser("End of LIST\r\n"); // 323* :End of LIST ???
 }
 
 /*
@@ -457,14 +459,17 @@ void Server::awayCommand(std::vector<std::string> & args, User & user) {
 		throw connectionRestricted(user.getNickName());
 	}
 	else {
-		if (args.size() == 1) {
+		if (args.size() == 1) { // если есть какой-то аргумент, то устанавливаем away мессаге
 			std::string awayMessage = args[0]; // там же текст
 			user.setAwayMessage(awayMessage);
-			//			user.messageToUser(":You have been marked as being away") // 306 ошибка
 			throw awayMessageHaveBeenSet(user.getNickName());
 		}
-		else
-			throw needMoreParams(user.getNickName(), "AWAY");
+		else { // хотим снять away message, устанавливаем типа ничего в сет и хо то во
+            if (args.empty()) {
+                user.setAwayMessage("");
+                throw awayMessageHaveBeenUnset(user.getNickName());
+            }
+        }
 	}
 }
 	
@@ -490,9 +495,9 @@ std::vector<Channel *> Server::getChannels()
 }
 
 std::string Server::constructError(const std::string & code,
-								   const std::string & message,
-								   const std::string & nick = "*",
-								   const std::string & secondParam = "") const {
+                                               const std::string & message,
+                                               const std::string & nick = "*",
+                                               const std::string & secondParam = "") const {
 	return code + " " + nick + " " + secondParam + " " + ":" + message + "\r\n";
 }
 
@@ -528,4 +533,12 @@ void Server::removeUser(User *user) {
 
 std::runtime_error Server::awayMessageHaveBeenSet(const std::string &nick) const {
     return std::runtime_error(constructError("306", "You have been marked as being away", nick));
+}
+
+std::string Server::awayMessageHaveBeenUnset(const std::string &nick) const {
+    return constructError("306", "You are no longer marked as being away", nick);
+}
+
+std::runtime_error Server::NoRecipientGiven(const std::string &nick) const {
+    return std::runtime_error(constructError("411", ":No recipient given ", nick));
 }
