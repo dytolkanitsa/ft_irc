@@ -54,7 +54,7 @@ public:
 
 	void	setAwayMessage(std::string	message);
 	std::string 	getAwayMessage();
-	 void leaveAllChannels();
+    void leaveAllChannels();
 };
 
 

@@ -60,6 +60,9 @@ public:
 	std::string noSuchNick(const std::string & nick, const std::string & recipient) const;
 	std::string rplAway(const std::string & nick, const std::string & recipient, const std::string & message) const;
 	std::string welcomeMsg(const std::string & nick) const;
+	std::string NoRecipientGiven(const std::string &nick) const;
+	std::string awayMessageHaveBeenUnset(const std::string &nick) const;
+
 	// Commands
 	void passCommand(std::vector<std::string> & args, User & user) const;
 	void userCommand(std::vector<std::string> & args, User & user) const;
