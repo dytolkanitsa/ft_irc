@@ -1,4 +1,6 @@
 #include "Channel.hpp"
+#include "User.hpp"
+
 
 Channel::Channel(std::string chName) : channelName(chName) {
 }
@@ -14,15 +16,16 @@ std::vector<User *> Channel::getUsers(void) {
 	return users;
 }
 
-User*	Channel::getUser(std::string	userName) {
+/*User*	Channel::getUser(std::string	userName) {
 	for (std::vector<User*>::const_iterator i = users.begin(); i != users.end(); i++)
 	{
-		if ((*i)->getNickName() == userName)
+		if ((*i).getNickName() == userName)
 			return (*i);
 	}
 	return nullptr;
-}
+}*/
 
+/*
 bool	Channel::ifUserExist(std::string userName) {
 	for (std::vector<User*>::const_iterator i = users.begin(); i != users.end(); i++)
 	{
@@ -31,6 +34,7 @@ bool	Channel::ifUserExist(std::string userName) {
 	}
 	return false;
 }
+*/
 
 void	Channel::setUser(User* user) {
 	users.push_back(user);

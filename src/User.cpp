@@ -2,6 +2,7 @@
 // Created by shaurmyashka on 10/1/21.
 //
 
+#include "Channel.hpp"
 #include "User.hpp"
 
 User::User(int socketFd) : socketFd(socketFd), registered(false), enterPassword(false), isOperator(false), nickName("*"){}
@@ -9,11 +10,11 @@ User::User(int socketFd) : socketFd(socketFd), registered(false), enterPassword(
 User::~User() {
 }
 
-std::string	User::getNickName() const {
+std::string	User::getNickName() /*const*/ {
 	return nickName;
 }
 
-int	User::getSocketFd() const {
+int	User::getSocketFd() /*const*/ {
 	return socketFd;
 }
 
@@ -49,7 +50,7 @@ void User::removeOperator() {
 	this->isOperator = false;
 }
 
-void User::messageToUser(const std::string & msg) const {
+void User::messageToUser(const std::string & msg)/* const*/ {
 	send(this->socketFd, msg.c_str(), msg.length(), 0);
 }
 
@@ -63,4 +64,11 @@ void	User::setAwayMessage(std::string	message) {
 
 std::string	User::getAwayMessage() {
 	return awayMessage;
+}
+
+void User::leaveAllChannels() {
+	for (int i = 0; i != this->channels.size(); i++){
+		channels[i]->removeUser(this->nickName);
+		channels.erase(channels.begin() + i);
+	}
 }
