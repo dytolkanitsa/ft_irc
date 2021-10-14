@@ -513,7 +513,7 @@ std::string Server::constructMessage(const std::string & sender,
 									 const std::string & command,
 									 const std::string & recipient,
 									 const std::string & message) const {
-	return ": " + sender + " " + command + " " + recipient + " " + ":" + message + "\r\n";
+	return ":" + sender + " " + command + " " + recipient + " " + ((message.empty()) ? "" : ":" + message) + "\r\n";
 }
 
 std::string Server::alreadyRegistered(const std::string & nick) const {
