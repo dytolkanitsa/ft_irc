@@ -426,19 +426,9 @@ void	Server::listCommand(std::vector<std::string> & args, User & user)
 	std::vector<Channel *> channels_ =  this->getChannels();
 	for (std::vector<Channel *>::const_iterator i = channels_.begin(); i != channels_.end(); i++)
 	{
-		user.messageToUser((*i)->getChannelName())
+		user.messageToUser((*i)->getChannelName());
 	}
 	user.messageToUser("End of LIST\r\n"); // 323* :End of LIST ???
-}
-
-/*
-!НЕ СДЕЛАН
-кикает пользователя с канала
-*/
-void	Server::kickCommand(std::vector<std::string> & args, User & user)
-{
-	if (!user.getRegistered()) {
-		throw connectionRestricted(user.getNickName());
 }
 
 /*
@@ -454,7 +444,8 @@ void Server::awayCommand(std::vector<std::string> & args, User & user) {
 		if (args.size() == 1) {
 			std::string awayMessage = args[0]; // там же текст
 			user.setAwayMessage(awayMessage);
-			user.messageToUser(":You have been marked as being away") // 306 ошибка
+//			user.messageToUser(":You have been marked as being away") // 306 ошибка
+            throw awayMessageHaveBeenSet(user.getNickName());
 		}
 		else
 			throw needMoreParams(user.getNickName(), "AWAY");
@@ -505,4 +496,8 @@ std::runtime_error Server::nickInUse(const std::string & nick, const std::string
 
 std::runtime_error Server::connectionRestricted(const std::string &nick) const {
 	return std::runtime_error(constructError("484", "Your connection is restricted!", nick));
+}
+
+std::runtime_error Server::awayMessageHaveBeenSet(const std::string &nick) const {
+    return std::runtime_error(constructError("306", "You have been marked as being away", nick));
 }
