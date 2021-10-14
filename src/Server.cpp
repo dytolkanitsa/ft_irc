@@ -126,7 +126,7 @@ void Server::acceptProcess() {
 			}
 		}
 		if ((nowPollfd.revents & POLLHUP) == POLLHUP){ ///кто-то оборвал соединение
-			std::cout <<GREEN  "psjslifskfjklsdfjsld" STD<<std::endl;
+//			std::cout <<GREEN  "psjslifskfjklsdfjsld" STD<<std::endl;
 			User *user = findUserByFd(nowPollfd.fd);
 			if (user == nullptr){
 				continue; // я вот вообще честно говоря вообще не знаю, когда такое может произойти
@@ -134,7 +134,7 @@ void Server::acceptProcess() {
 			this->removeUser(user);
 			close(fds[i].fd);
 			this->fds.erase(fds.begin() + i);
-			exit(100);
+//			exit(100);
 		}
 	}
 }
