@@ -277,8 +277,8 @@ void Server::commandProcess(User & user, const std::string & message) {
 		// else if (args[0] == "MODE"){}
 		else if (args[0] == "KICK"){}
 		// else if (args[0] == "ADMIN"){}
-	} catch (std::runtime_error & error) {
-		user.sendMessage(error.what());
+	} catch (std::string & error) {
+		user.sendMessage(error);
 	}
 }
 
@@ -297,8 +297,12 @@ void Server::userCommand(std::vector<std::string> & args, User & user) const {
 	if (args.size() != 4) {
 		throw needMoreParams(user.getNickName(), "USER");
 	}
+	if (user.getRegistered()) {
+		throw alreadyRegistered(user.getNickName());
+	}
 	user.setRealName(args[3]);
 	user.setRegistered(true);
+	user.sendMessage(welcomeMsg(user.getNickName()));
 }
 
 void Server::nickCommand(std::vector<std::string> & args, User & user) const {
@@ -310,7 +314,7 @@ void Server::nickCommand(std::vector<std::string> & args, User & user) const {
 		throw nickInUse(user.getNickName(), args[0]);
 	}
 	user.setNickName(args[0]);
-	user.sendMessage(":" + prevNick + " NICK " + user.getNickName() + "\r\n");
+	user.sendMessage(this->constructMessage(prevNick, "NICK", user.getNickName()));
 }
 
 /**
@@ -349,15 +353,17 @@ void Server::privmsgCommand(std::vector<std::string> & args, User & user) {
 		std::vector<std::string> receivers = getReceivers(args[1]);
 		for (int i = 0; i < receivers.size(); i++) {
 			User *recipientUser = this->findUserByName(receivers.at(i));
-			if (recipientUser != nullptr){
-				recipientUser->sendMessage(args[args.size() - 1]);
-			if (recipientUser->getAwayMessage().size()!= 0) { //away message
-				throw std::runtime_error(recipientUser->getAwayMessage()); // выкидываем юзеру away message другого юзера
-			}
-			} else{
+			if (recipientUser != nullptr) {
+				recipientUser->sendMessage(constructMessage(user.getNickName(), "PRIVMSG", recipientUser->getNickName(), args[args.size() - 1]));
+				if (recipientUser->getAwayMessage().size()!= 0) { //away message
+					// выкидываем юзеру away message другого юзера
+//					recipientUser->sendMessage(constructReply(recipientUser->getNickName(), "PRIVMSG", user.getNickName(), recipientUser->getAwayMessage()));
+					recipientUser->sendMessage(rplAway(user.getNickName(), recipientUser->getNickName(), recipientUser->getAwayMessage()));
+				}
+			} else {
 				Channel *channel = this->findChannelByName(receivers.at(i));
 				if (channel == nullptr){
-					throw std::runtime_error("Wrong receiver");
+					throw noSuchNick(user.getNickName(), receivers.at(i));
 				}
 				channel->sendMessageToChannel(args.at(args.size() -1), &user);
 			}
@@ -381,7 +387,7 @@ void	Server::noticeCommand(std::vector<std::string> & args, User & user) {
 			} else{
 				Channel *channel = this->findChannelByName(receivers.at(i));
 				if (channel == nullptr){
-					throw std::runtime_error("Wrong receiver");
+					recipientUser->sendMessage(rplAway(user.getNickName(), recipientUser->getNickName(), recipientUser->getAwayMessage()));
 				}
 				channel->sendMessageToChannel(args.at(args.size() -1), &user);
 			}
@@ -489,31 +495,38 @@ std::vector<Channel *> Server::getChannels()
 	return channels;
 }
 
-std::string Server::constructError(const std::string & code,
+std::string Server::constructReply(const std::string & code,
 								   const std::string & message,
 								   const std::string & nick = "*",
 								   const std::string & secondParam = "") const {
 	return code + " " + nick + " " + secondParam + " " + ":" + message + "\r\n";
 }
 
-std::runtime_error Server::alreadyRegistered(const std::string & nick) const {
-	return std::runtime_error(constructError("462", "Not enough parameters", nick));
+std::string Server::constructMessage(const std::string & sender,
+									 const std::string & command,
+									 const std::string & recipient,
+									 const std::string & message) const {
+	return ": " + sender + " " + command + " " + recipient + " " + ":" + message + "\r\n";
 }
 
-std::runtime_error Server::needMoreParams(const std::string & nick, const std::string & command) const {
-	return std::runtime_error(constructError("461", "Not enough parameters", nick));
+std::string Server::alreadyRegistered(const std::string & nick) const {
+	return constructReply("462", "You may not reregister", nick);
 }
 
-std::runtime_error Server::passMismatch(const std::string & nick) const {
-	return std::runtime_error(constructError("464", "Password incorrect", nick));
+std::string Server::needMoreParams(const std::string & nick, const std::string & command) const {
+	return constructReply("461", "Not enough parameters", nick);
 }
 
-std::runtime_error Server::nickInUse(const std::string & nick, const std::string & newNick) const {
-	return std::runtime_error(constructError("433", "Nickname is already in use", nick, newNick));
+std::string Server::passMismatch(const std::string & nick) const {
+	return constructReply("464", "Password incorrect", nick);
 }
 
-std::runtime_error Server::connectionRestricted(const std::string &nick) const {
-	return std::runtime_error(constructError("484", "Your connection is restricted!", nick));
+std::string Server::nickInUse(const std::string & nick, const std::string & newNick) const {
+	return constructReply("433", "Nickname is already in use", nick, newNick);
+}
+
+std::string Server::connectionRestricted(const std::string &nick) const {
+	return constructReply("484", "Your connection is restricted!", nick);
 }
 
 void Server::removeUser(User *user) {
@@ -526,6 +539,19 @@ void Server::removeUser(User *user) {
 	}
 }
 
-std::runtime_error Server::awayMessageHaveBeenSet(const std::string &nick) const {
-    return std::runtime_error(constructError("306", "You have been marked as being away", nick));
+std::string Server::awayMessageHaveBeenSet(const std::string &nick) const {
+    return constructReply("306", "You have been marked as being away", nick);
 }
+
+std::string Server::noSuchNick(const std::string &nick, const std::string & recipient) const {
+	return constructReply("401", "No such nick/channel", nick, recipient);
+}
+
+std::string Server::rplAway(const std::string &nick, const std::string &recipient, const std::string &message) const {
+	return constructReply("401", message, nick, recipient);
+}
+
+std::string Server::welcomeMsg(const std::string &nick) const {
+	return constructReply("001", "Welcome to the Internet Relay Network!", nick);
+}
+
