@@ -434,25 +434,16 @@ void	Server::listCommand(std::vector<std::string> & args, User & user)
 {
 	if (!user.getRegistered()) {
 		throw connectionRestricted(user.getNickName());
-	if (args.empty()) {
-		throw needMoreParams(user.getNickName(), "LIST");
+		if (args.empty()) {
+			throw needMoreParams(user.getNickName(), "LIST");
+		}
+		std::vector<Channel *> channels_ =  this->getChannels();
+		for (std::vector<Channel *>::const_iterator i = channels_.begin(); i != channels_.end(); i++)
+		{
+			user.messageToUser((*i)->getChannelName());
+		}
+		user.messageToUser("End of LIST\r\n"); // 323* :End of LIST ???
 	}
-	std::vector<Channel *> channels_ =  this->getChannels();
-	for (std::vector<Channel *>::const_iterator i = channels_.begin(); i != channels_.end(); i++)
-	{
-		user.messageToUser((*i)->getChannelName())
-	}
-	user.messageToUser("End of LIST\r\n"); // 323* :End of LIST ???
-}
-
-/*
-!НЕ СДЕЛАН
-кикает пользователя с канала
-*/
-void	Server::kickCommand(std::vector<std::string> & args, User & user)
-{
-	if (!user.getRegistered()) {
-		throw connectionRestricted(user.getNickName());
 }
 
 /*
@@ -464,15 +455,19 @@ void	Server::kickCommand(std::vector<std::string> & args, User & user)
 void Server::awayCommand(std::vector<std::string> & args, User & user) {
 	if (!user.getRegistered()) {
 		throw connectionRestricted(user.getNickName());
+	}
 	else {
 		if (args.size() == 1) {
 			std::string awayMessage = args[0]; // там же текст
 			user.setAwayMessage(awayMessage);
-			user.messageToUser(":You have been marked as being away") // 306 ошибка
+			//			user.messageToUser(":You have been marked as being away") // 306 ошибка
+			throw awayMessageHaveBeenSet(user.getNickName());
 		}
 		else
 			throw needMoreParams(user.getNickName(), "AWAY");
+	}
 }
+	
 /**
  * создает канал, добавляет его в вектор каналов и добавляет создавшего юзера в этот канал, а так же добавляет канал юзеру в вектор
  * @param user пользователь создавший канал
@@ -529,4 +524,8 @@ void Server::removeUser(User *user) {
 			break;
 		}
 	}
+}
+
+std::runtime_error Server::awayMessageHaveBeenSet(const std::string &nick) const {
+    return std::runtime_error(constructError("306", "You have been marked as being away", nick));
 }

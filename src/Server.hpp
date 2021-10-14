@@ -52,13 +52,17 @@ public:
 	std::runtime_error passMismatch(const std::string & nick) const;
 	std::runtime_error nickInUse(const std::string &nick, const std::string &newNick) const;
 	std::runtime_error connectionRestricted(const std::string &nick) const;
+    std::runtime_error awayMessageHaveBeenSet(const std::string &nick) const;
 
 	// Commands
 	void passCommand(std::vector<std::string> & args, User & user) const;
 	void userCommand(std::vector<std::string> & args, User & user) const;
 	void nickCommand(std::vector<std::string> & args, User & user) const;
-	void privmsgCommand(std::vector<std::string> & args, User & user);
-	void joinCommand(std::vector<std::string> & args, User & user);
+    void privmsgCommand(std::vector<std::string> & args, User & user);
+    void noticeCommand(std::vector<std::string> & args, User & user);
+    void listCommand(std::vector<std::string> & args, User & user);
+    void awayCommand(std::vector<std::string> & args, User & user);
+    void joinCommand(std::vector<std::string> & args, User & user);
 	void namesCommand(std::vector<std::string> & args, User & user);
 
 	void createChannel(User *user, std::string name);
