@@ -16,7 +16,7 @@
 #define STD "\033[0m"
 
 Server::Server(const std::string *host, const std::string &port, const std::string &password)
-: host(nullptr), port(port), password(password), socketFd(-1) {
+: host(host), port(port), password(password), socketFd(-1) {
 }
 
 /**
@@ -34,7 +34,8 @@ void Server::init() {
 	hints.ai_flags = AI_PASSIVE;     // заполните мой IP-адрес за меня
 
 	if ((status = getaddrinfo(this->host ? this->host->c_str() : nullptr, this->port.c_str(), &hints, &serverInfo)) != 0) {
-		// TODO: errors
+		throw std::runtime_error("getaddrinfo error");
+		exit(1);
 	}
 	for (rp = serverInfo; rp != nullptr; rp = rp->ai_next) {
 		socketFd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
@@ -42,7 +43,7 @@ void Server::init() {
 			continue;
 		}
 		if (setsockopt(socketFd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
-			// TODO: errors
+			throw std::runtime_error("setsockopt error");
 		}
 		if (bind(socketFd, rp->ai_addr, rp->ai_addrlen) == 0) {
 			break; // Success
@@ -50,8 +51,8 @@ void Server::init() {
 		close(socketFd);
 	}
 	if (rp == nullptr)  {
+		throw std::runtime_error("bind error");
 		exit(1);
-		// todo: bind error
 	}
 	freeaddrinfo(serverInfo); // освобождаем связанный список
 	this->socketFd = socketFd;
@@ -62,22 +63,22 @@ void Server::init() {
  * добавление в вектор структур, и главный цикл
  */
 [[noreturn]] void Server::start() {
-	if (listen(this->socketFd, 10) == -1){//todo: 10 - очередь из соединений
+	if (listen(this->socketFd, 10) == -1){
+		throw std::runtime_error("listen error");
 		exit(1);
-		//todo: listen error
 	}
 	pollfd sPollfd {this->socketFd, POLLIN, 0};
 	if (fcntl(this->socketFd, F_SETFL, O_NONBLOCK) == -1){
+		throw std::runtime_error("fcntl error");
 		exit(1);
-		//todo: fcntl error
 	}
 	this->fds.push_back(sPollfd);
 	std::vector<pollfd>::iterator	it;
 	while(true){
 		it = this->fds.begin();
 		if (poll(&(*it), this->fds.size(), -1) == -1){
+			throw std::runtime_error("poll error");
 			exit(1);
-			//todo: poll error
 		}
 	///после этого нужно что-то сделать с тем, что нам пришло после poll
 		this->acceptProcess();
@@ -180,12 +181,18 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 	std::string lastArg;
 	size_t pos = 0;
 	size_t newPos = 0;
+	unsigned long space_skip = argString.length() -3;
 
 	newPos = argString.find("\r\n");
 	if (newPos != std::string::npos){
 		argString = argString.substr(0, newPos);
 	}
-
+	while(argString[space_skip] == ' ' && space_skip != 0){
+		space_skip--;
+	}
+	if (space_skip != 0){
+		argString = argString.substr(0, space_skip + 1);
+	}
 	newPos = argString.find(':', 0);
 	if (newPos != std::string::npos){
 		lastArg = argString.substr(newPos + 1);
@@ -467,7 +474,7 @@ void Server::awayCommand(std::vector<std::string> & args, User & user) {
 			throw needMoreParams(user.getNickName(), "AWAY");
 	}
 }
-	
+
 /**
  * создает канал, добавляет его в вектор каналов и добавляет создавшего юзера в этот канал, а так же добавляет канал юзеру в вектор
  * @param user пользователь создавший канал

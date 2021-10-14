@@ -27,8 +27,8 @@ std::string * getArgs(const std::string& av){
 
 int main(int ac, char ** av){
 	if (ac == 3){
+		av[2][strlen(av[2] -1)] = '\0';
 		Server server(nullptr, av[1], av[2]);
-
 	} else if (ac == 4){
 		std::string *res = getArgs(av[1]);
 		if (res == nullptr){
@@ -43,7 +43,7 @@ int main(int ac, char ** av){
 	} else
 	{
 		std::cout << "./ircserv [host:port_network:password_network] <port> <password>\n";
-		/*todo: args error*/
+		return 1;
 	}
 }
 
