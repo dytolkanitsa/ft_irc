@@ -42,17 +42,26 @@ public:
 //	Command *findCommandByName(std::string commandName); нужна map
 	std::vector<std::string> setArgs(std::string argString);
 
-	// Errors
-	std::string constructError(const std::string & code,
+	// Replies
+	std::string constructReply(const std::string & code,
 							   const std::string & message,
 							   const std::string & nick,
 							   const std::string & secondParam) const;
-	std::runtime_error alreadyRegistered(const std::string & nick) const;
-	std::runtime_error needMoreParams(const std::string & nick, const std::string & command) const;
-	std::runtime_error passMismatch(const std::string & nick) const;
-	std::runtime_error nickInUse(const std::string &nick, const std::string &newNick) const;
-	std::runtime_error connectionRestricted(const std::string &nick) const;
-    std::runtime_error awayMessageHaveBeenSet(const std::string &nick) const;
+	std::string constructMessage(const std::string & sender,
+								 const std::string & command,
+								 const std::string & recipient,
+								 const std::string & message = "") const;
+	std::string alreadyRegistered(const std::string & nick) const;
+	std::string needMoreParams(const std::string & nick, const std::string & command) const;
+	std::string passMismatch(const std::string & nick) const;
+	std::string nickInUse(const std::string &nick, const std::string &newNick) const;
+	std::string connectionRestricted(const std::string &nick) const;
+    std::string awayMessageHaveBeenSet(const std::string &nick) const;
+	std::string noSuchNick(const std::string & nick, const std::string & recipient) const;
+	std::string rplAway(const std::string & nick, const std::string & recipient, const std::string & message) const;
+	std::string welcomeMsg(const std::string & nick) const;
+	std::string NoRecipientGiven(const std::string &nick) const;
+	std::string awayMessageHaveBeenUnset(const std::string &nick) const;
 
 	// Commands
 	void passCommand(std::vector<std::string> & args, User & user) const;

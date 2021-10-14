@@ -50,7 +50,7 @@ void User::removeOperator() {
 	this->isOperator = false;
 }
 
-void User::messageToUser(const std::string & msg)/* const*/ {
+void User::sendMessage(const std::string & msg)/* const*/ {
 	send(this->socketFd, msg.c_str(), msg.length(), 0);
 }
 

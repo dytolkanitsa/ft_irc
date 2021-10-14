@@ -29,7 +29,7 @@ public:
 	User(int socketFd);
 	virtual ~User();
 
-	void	messageToUser(const std::string & msg)/* const*/;
+	void	sendMessage(const std::string & msg)/* const*/;
 
 	std::string 	getNickName() /*const*/;
 	int 			getSocketFd() /*const*/;
@@ -54,7 +54,7 @@ public:
 
 	void	setAwayMessage(std::string	message);
 	std::string 	getAwayMessage();
-	 void leaveAllChannels();
+    void leaveAllChannels();
 };
 
 
