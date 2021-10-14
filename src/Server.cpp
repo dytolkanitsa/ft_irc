@@ -16,7 +16,7 @@
 #define STD "\033[0m"
 
 Server::Server(const std::string *host, const std::string &port, const std::string &password)
-: host(host), port(port), password(password), socketFd(-1) {
+: host(nullptr), port(port), password(password), socketFd(-1) {
 }
 
 /**
@@ -350,16 +350,16 @@ void Server::privmsgCommand(std::vector<std::string> & args, User & user) {
 	if (!user.getRegistered()) {
 		throw connectionRestricted(user.getNickName());
 	}
-	if (args.size() != 3) {
+	if (args.size() < 2) {
 		throw needMoreParams(user.getNickName(), "PRIVMSG");
 	}
 	else {
-		std::vector<std::string> receivers = getReceivers(args[1]);
+		std::vector<std::string> receivers = getReceivers(args[0]);
 		for (int i = 0; i < receivers.size(); i++) {
 			User *recipientUser = this->findUserByName(receivers.at(i));
 			if (recipientUser != nullptr) {
 				recipientUser->sendMessage(constructMessage(user.getNickName(), "PRIVMSG", recipientUser->getNickName(), args[args.size() - 1]));
-				if (recipientUser->getAwayMessage().size()!= 0) { //away message
+				if (!recipientUser->getAwayMessage().empty()) { //away message
 					// выкидываем юзеру away message другого юзера
 //					recipientUser->sendMessage(constructReply(recipientUser->getNickName(), "PRIVMSG", user.getNickName(), recipientUser->getAwayMessage()));
 					recipientUser->sendMessage(rplAway(user.getNickName(), recipientUser->getNickName(), recipientUser->getAwayMessage()));
@@ -379,7 +379,7 @@ void	Server::noticeCommand(std::vector<std::string> & args, User & user) {
 	if (!user.getRegistered()) {
 		throw connectionRestricted(user.getNickName());
 	}
-	if (args.size() != 3) {
+	if (args.size() < 2) {
 		throw needMoreParams(user.getNickName(), "NOTICE");
 	}
 	else {
