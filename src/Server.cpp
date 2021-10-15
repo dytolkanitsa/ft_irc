@@ -188,7 +188,7 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 		spaceSkip--;
 	}
 	if (spaceSkip != 0){
-		argString = argString.substr(0, spaceSkip + 1);
+		argString = argString.substr(0, spaceSkip + 2);
 	}
 	newPos = argString.find(':', 0);
 	if (newPos != std::string::npos){
@@ -265,19 +265,19 @@ void Server::commandProcess(User & user, const std::string & message) {
 		else if (command == "PRIVMSG") {
 			this->privmsgCommand(args, user);
 		}
-		else if (args[0] == "JOIN"){
+		else if (command == "JOIN"){
 			this->joinCommand(args, user);
 		}
-		else if (args[0] == "LIST"){
+		else if (command == "LIST"){
 			this->listCommand(args, user);
 		}
-		else if (args[0] == "NOTICE"){
+		else if (command == "NOTICE"){
 			this->noticeCommand(args, user);
 		}
-		else if (args[0] == "AWAY"){
+		else if (command == "AWAY"){
 			this->awayCommand(args, user);
 		}
-		else if (args[0] == "NAMES"){
+		else if (command == "NAMES"){
 			this->namesCommand(args, user);
 		}
 		else if (command == "QUIT"){}
@@ -374,7 +374,7 @@ void Server::privmsgCommand(std::vector<std::string> & args, User & user) {
 				if (!recipientUser->getAwayMessage().empty()) { //away message
 					// выкидываем юзеру away message другого юзера
 //					recipientUser->sendMessage(constructReply(recipientUser->getNickName(), "PRIVMSG", user.getNickName(), recipientUser->getAwayMessage()));
-					recipientUser->sendMessage(rplAway(user.getNickName(), recipientUser->getNickName(), recipientUser->getAwayMessage()));
+					user.sendMessage(rplAway(user.getNickName(), recipientUser->getNickName(), recipientUser->getAwayMessage()));
 				}
 			} else {
 				Channel *channel = this->findChannelByName(receivers.at(i));
