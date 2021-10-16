@@ -178,16 +178,17 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 	std::string lastArg;
 	size_t pos = 0;
 	size_t newPos = 0;
-	unsigned long spaceSkip = argString.length() - 3;
 
 	newPos = argString.find("\r\n");
 	if (newPos != std::string::npos){
 		argString = argString.substr(0, newPos);
 	}
+
+	unsigned long spaceSkip = argString.length() - 1;
 	while(argString[spaceSkip] == ' ' && spaceSkip != 0){
 		spaceSkip--;
 	}
-	if (spaceSkip != 0){
+	if (spaceSkip != argString.length() - 3){
 		argString = argString.substr(0, spaceSkip + 2);
 	}
 	newPos = argString.find(':', 0);
@@ -395,7 +396,7 @@ void	Server::noticeCommand(std::vector<std::string> & args, User & user) {
 		throw needMoreParams(user.getNickName(), "NOTICE");
 	}
 	else {
-		std::vector<std::string> receivers = getReceivers(args[1]);
+		std::vector<std::string> receivers = getReceivers(args[0]);
 		for (int i = 0; i < receivers.size(); i++) {
 			User *recipientUser = this->findUserByName(receivers.at(i));
 			if (recipientUser != nullptr){
@@ -415,11 +416,11 @@ void Server::joinCommand(std::vector<std::string> & args, User & user) {
 	if (!user.getRegistered()) {
 		throw connectionRestricted(user.getNickName());
 	}
-	if (args.size() != 2){
+	if (args.size() != 1){
 		throw needMoreParams(user.getNickName(), "JOIN");
 	}
-	std::vector<std::string> channelsForJoin = getReceivers(args.at(1));
-	for (int i = 1; i < channelsForJoin.size(); i++){
+	std::vector<std::string> channelsForJoin = getReceivers(args.at(0));
+	for (int i = 0; i < channelsForJoin.size(); i++){
 		Channel *channel = findChannelByName(channelsForJoin[i]);
 		if (channel == nullptr){
 			createChannel(&user, channelsForJoin[i]);
