@@ -124,7 +124,6 @@ void Server::acceptProcess() {
 			}
 		}
 		if ((nowPollfd.revents & POLLHUP) == POLLHUP){ ///кто-то оборвал соединение
-//			std::cout <<GREEN  "psjslifskfjklsdfjsld" STD<<std::endl;
 			User *user = findUserByFd(nowPollfd.fd);
 			if (user == nullptr){
 				continue; // я вот вообще честно говоря вообще не знаю, когда такое может произойти
@@ -132,7 +131,6 @@ void Server::acceptProcess() {
 			this->removeUser(user);
 			close(fds[i].fd);
 			this->fds.erase(fds.begin() + i);
-//			exit(100);
 		}
 	}
 }
@@ -281,7 +279,9 @@ void Server::commandProcess(User & user, const std::string & message) {
 		else if (command == "NAMES"){
 			this->namesCommand(args, user);
 		}
-		else if (command == "QUIT"){}
+		else if (command == "QUIT"){
+			this->quitCommand(args, user);
+		}
 		else if (args[0] == "PART"){}
 		// else if (args[0] == "MODE"){}
 		else if (args[0] == "KICK"){}
@@ -559,6 +559,14 @@ void Server::removeUser(User *user) {
 	}
 }
 
+
+
+void Server::quitCommand(std::vector<std::string> &args, User &user) {
+	this->removeUser(&user);
+	close(user.getSocketFd());
+	this->removePollfd(user.getSocketFd());
+}
+
 std::string Server::awayMessageHaveBeenSet(const std::string &nick) const {
     return constructReply("306", "You have been marked as being away", nick);
 }
@@ -582,4 +590,13 @@ std::string Server::awayMessageHaveBeenUnset(const std::string &nick) const {
 
 std::string Server::NoRecipientGiven(const std::string &nick) const {
     return constructReply("411", ":No recipient given ", nick);
+}
+
+void Server::removePollfd(int fd) {
+	for (int i = 0; i < fds.size(); i++){
+		if (fd == fds[i].fd){
+			this->fds.erase(fds.begin() + i);
+			break;
+		}
+	}
 }

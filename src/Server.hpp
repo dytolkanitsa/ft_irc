@@ -73,11 +73,13 @@ public:
     void awayCommand(std::vector<std::string> & args, User & user);
     void joinCommand(std::vector<std::string> & args, User & user);
 	void namesCommand(std::vector<std::string> & args, User & user);
+	void quitCommand(std::vector<std::string> & args, User & user);
 
 	void createChannel(User *user, std::string name);
 	void showUsers();
 
 	std::vector<Channel *> getChannels();
 	void removeUser(User *user);
+	void removePollfd(int fd);
 };
 #endif //FT_IRC_SERVER_HPP
