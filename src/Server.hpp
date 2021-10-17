@@ -62,6 +62,7 @@ public:
 	std::string welcomeMsg(const std::string & nick) const;
 	std::string NoRecipientGiven(const std::string &nick) const;
 	std::string awayMessageHaveBeenUnset(const std::string &nick) const;
+	std::string notOnChannel(const std::string &nick, const std::string &channel) const;
 
 	// Commands
 	void passCommand(std::vector<std::string> & args, User & user) const;
@@ -74,12 +75,13 @@ public:
     void joinCommand(std::vector<std::string> & args, User & user);
 	void namesCommand(std::vector<std::string> & args, User & user);
 	void quitCommand(std::vector<std::string> & args, User & user);
+	void partCommand(std::vector<std::string> & args, User & user);
 
 	void createChannel(User *user, std::string name);
-	void showUsers();
 
 	std::vector<Channel *> getChannels();
 	void removeUser(User *user);
 	void removePollfd(int fd);
+	void removeChannel(std::string channelName);
 };
 #endif //FT_IRC_SERVER_HPP

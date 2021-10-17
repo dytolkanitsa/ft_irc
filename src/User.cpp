@@ -50,7 +50,8 @@ void User::removeOperator() {
 	this->isOperator = false;
 }
 
-void User::sendMessage(const std::string & msg)/* const*/ {
+void User::sendMessage(std::string msg)/* const*/ {
+	msg += "\r\n";
 	send(this->socketFd, msg.c_str(), msg.length(), 0);
 }
 
@@ -67,7 +68,7 @@ std::string	User::getAwayMessage() {
 }
 
 void User::leaveAllChannels() {
-	for (int i = 0; i != this->channels.size(); i++){
+	for (int i = 0; i < this->channels.size(); i++){
 		channels[i]->removeUser(this->nickName);
 		channels.erase(channels.begin() + i);
 	}

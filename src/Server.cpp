@@ -177,6 +177,9 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 	size_t pos = 0;
 	size_t newPos = 0;
 
+	if (argString.empty()){
+		return args;
+	}
 	newPos = argString.find("\r\n");
 	if (newPos != std::string::npos){
 		argString = argString.substr(0, newPos);
@@ -249,6 +252,9 @@ User *Server::findUserByFd(int fd) {
  */
 void Server::commandProcess(User & user, const std::string & message) {
 	std::vector<std::string> args = setArgs(message);
+	if (args.empty()){
+		return;
+	}
 	try {
 		std::string command = args[0];
 		args.erase(args.begin());
@@ -282,7 +288,9 @@ void Server::commandProcess(User & user, const std::string & message) {
 		else if (command == "QUIT"){
 			this->quitCommand(args, user);
 		}
-		else if (args[0] == "PART"){}
+		else if (command == "PART"){
+			this->partCommand(args, user);
+		}
 		// else if (args[0] == "MODE"){}
 		else if (args[0] == "KICK"){}
 		// else if (args[0] == "ADMIN"){}
@@ -382,7 +390,10 @@ void Server::privmsgCommand(std::vector<std::string> & args, User & user) {
 				if (channel == nullptr){
 					throw noSuchNick(user.getNickName(), receivers.at(i));
 				}
-				channel->sendMessageToChannel(args.at(args.size() -1), &user);
+				if (channel->ifUserExist(user.getNickName())) /*проверка на тор, чьо юзер вообще есть на канале*/
+					channel->sendMessageToChannel(args.at(args.size() -1), &user);
+				else
+					throw notOnChannel(receivers[i], user.getNickName());
 			}
 		}
 	}
@@ -426,6 +437,7 @@ void Server::joinCommand(std::vector<std::string> & args, User & user) {
 			createChannel(&user, channelsForJoin[i]);
 		} else {
 			user.addChannel(channel);
+			channel->setUser(&user);
 			//todo: message about join
 //			channel->sendMessageToChannel(args.at(args.size() - 1), &user);
 		}
@@ -506,8 +518,29 @@ void Server::createChannel(User *user, std::string name) {
 	channel->setUser(user);// todo: сделат оператором
 }
 
-void Server::showUsers() {
-
+void Server::partCommand(std::vector<std::string> &args, User &user) {
+	if (!user.getRegistered()){
+		throw connectionRestricted(user.getNickName());
+	}
+	if (args.size() != 1){
+		throw needMoreParams(user.getNickName(), "PART");
+	}
+	std::vector<std::string> receivers = getReceivers(args[0]);
+	for(int i = 0; i < receivers.size(); i++){
+		Channel *channel = findChannelByName(receivers[i]);
+		if (channel == nullptr){
+			throw noSuchNick(user.getNickName(), receivers[i]);
+		}
+		if (channel->ifUserExist(user.getNickName())){
+			channel->removeUser(user.getNickName());
+			if (channel->isEmpty()){
+				removeChannel(channel->getChannelName());
+			}
+			throw "you leave a channel " + receivers[i];
+		}
+		else
+			throw notOnChannel(receivers[i], user.getNickName());
+	}
 }
 
 std::vector<Channel *> Server::getChannels()
@@ -593,9 +626,22 @@ std::string Server::NoRecipientGiven(const std::string &nick) const {
 }
 
 void Server::removePollfd(int fd) {
-	for (int i = 0; i < fds.size(); i++){
-		if (fd == fds[i].fd){
+	for (int i = 0; i < this->fds.size(); i++){
+		if (fd == this->fds[i].fd){
 			this->fds.erase(fds.begin() + i);
+			break;
+		}
+	}
+}
+
+std::string Server::notOnChannel(const std::string &nick, const std::string &channel) const {
+	return constructReply("442", ":You're not on that channel ", nick, channel);
+}
+
+void Server::removeChannel(std::string channelName) {
+	for(int i = 0; i < this->channels.size(); i++){
+		if (channelName == this->channels[i]->getChannelName()){
+			this->channels.erase(channels.begin() + i);
 			break;
 		}
 	}

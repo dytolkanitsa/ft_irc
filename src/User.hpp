@@ -29,7 +29,7 @@ public:
 	User(int socketFd);
 	virtual ~User();
 
-	void	sendMessage(const std::string & msg)/* const*/;
+	void	sendMessage(std::string msg)/* const*/;
 
 	std::string 	getNickName() /*const*/;
 	int 			getSocketFd() /*const*/;

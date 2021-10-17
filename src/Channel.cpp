@@ -49,6 +49,15 @@ void Channel::sendMessageToChannel(std::string msg, User *sender) {
 	}
 }
 
+bool Channel::ifUserExist(std::string userName) {
+	for(int i = 0; i < this->users.size(); i++) {
+		if (users[i]->getNickName() == userName) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void	 Channel::removeUser(std::string userName) {
 	 int found = 0;
 	for (std::vector<User *>::const_iterator i = users.begin(); i != users.end(); i++)
@@ -59,4 +68,11 @@ void	 Channel::removeUser(std::string userName) {
 	}
 	// erase удаляет из вектора диапазон элементов начиная с found знакачивая длиной строки
 	this->users.erase(users.begin() + found);
+}
+
+bool Channel::isEmpty() {
+	if(users.empty()){
+		return true;
+	}
+	return false;
 }
