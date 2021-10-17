@@ -189,8 +189,8 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 	while(argString[spaceSkip] == ' ' && spaceSkip != 0){
 		spaceSkip--;
 	}
-	if (spaceSkip != argString.length() - 3){
-		argString = argString.substr(0, spaceSkip + 2);
+	if (spaceSkip != argString.length() - 1){
+		argString = argString.substr(0, spaceSkip + 1);
 	}
 	newPos = argString.find(':', 0);
 	if (newPos != std::string::npos){
