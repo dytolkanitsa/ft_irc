@@ -441,7 +441,7 @@ void Server::joinCommand(std::vector<std::string> & args, User & user) {
             user.setIsOperator(true); // если канала нет и чел его создает, он оператор
             //todo: RPL_NOTOPIC , что канал создан
 		} else {
-			if (channel->ifUserExist(user.getNickName()))
+			if (!channel->ifUserExist(user.getNickName()))
 			{
 				user.addChannel(channel);
 				channel->setUser(&user);
