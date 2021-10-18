@@ -10,26 +10,30 @@ class User;
 class Channel
 {
 private:
-	std::vector <User *> users;
-	std::string			channelName;
-	std::string			topic;
+	std::vector <User *>    users;
+	std::string			    channelName;
+	std::string			    topic;
+    User *                  userOperator;
 
 public:
 	Channel(std::string chName);
-	virtual ~Channel();
+	virtual             ~Channel();
 
 	std::string			getChannelName(void);
-	std::vector<User *>	getUsers(void);
-	User*				getUser(std::string	userName);
+//	std::vector<User *>	getUsers(void);
+//	User*				getUser(std::string	userName);
 
-	bool	ifUserExist(std::string userName);
-	bool	isEmpty();
-	void	setUser(User* user);
-	void	sendMessageToChannel(std::string msg, User *sender);
-	void	removeUser(std::string userName);
-	void setTopic(std::string newTopic);
-	std::string setGetTopic(std::string newTopic);
-	std::string getTopic();
+	bool	            ifUserExist(std::string userName);
+	bool                isEmpty();
+	void	            setUser(User* user);
+	void	            sendMessageToChannel(std::string msg, User *sender);
+	void	            removeUser(std::string userName);
+	void                setTopic(std::string newTopic);
+	std::string         setGetTopic(std::string newTopic);
+	std::string         getTopic();
+
+    void                setOperators(User *operatorr);
+    User*               getOperator();
 };
 
 #endif

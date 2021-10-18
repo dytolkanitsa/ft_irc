@@ -176,6 +176,7 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 	std::string lastArg;
 	size_t pos = 0;
 	size_t newPos = 0;
+    unsigned long spaceSkip = argString.length() - 3;
 
 	if (argString.empty()){
 		return args;
@@ -184,13 +185,13 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 	if (newPos != std::string::npos){
 		argString = argString.substr(0, newPos);
 	}
-	unsigned long spaceSkip = argString.empty() ? 0 : argString.length() - 1;
+//	unsigned long spaceSkip = argString.empty() ? 0 : argString.length() - 1;
 //	unsigned long spaceSkip = argString.length() - 1;
 	while(argString[spaceSkip] == ' ' && spaceSkip != 0){
 		spaceSkip--;
 	}
 	if (spaceSkip != 0){
-		argString = argString.substr(0, spaceSkip + 1);
+		argString = argString.substr(0, spaceSkip + 2);
 	}
 	newPos = argString.find(':', 0);
 	if (newPos != std::string::npos){
@@ -395,10 +396,10 @@ void Server::privmsgCommand(std::vector<std::string> & args, User & user) {
 					throw noSuchNick(user.getNickName(), receivers.at(i));
 				}
                 channel->sendMessageToChannel(args.at(args.size() -1), &user);
-//				if (channel->ifUserExist(user.getNickName())) /*проверка на тор, чьо юзер вообще есть на канале*/
-//					channel->sendMessageToChannel(args.at(args.size() -1), &user);
-//				else
-//					throw notOnChannel(receivers[i], user.getNickName());
+				if (channel->ifUserExist(user.getNickName())) /*проверка на тор, чьо юзер вообще есть на канале*/
+					channel->sendMessageToChannel(args.at(args.size() -1), &user);
+				else
+					throw notOnChannel(receivers[i], user.getNickName());
 			}
 		}
 	}
@@ -440,7 +441,6 @@ void Server::joinCommand(std::vector<std::string> & args, User & user) {
 		Channel *channel = findChannelByName(channelsForJoin[i]);
 		if (channel == nullptr){
 			createChannel(&user, channelsForJoin[i]);
-            user.setIsOperator(true); // если канала нет и чел его создает, он оператор
             //todo: RPL_NOTOPIC , что канал создан
 		} else {
 			if (!channel->ifUserExist(user.getNickName()))
@@ -463,9 +463,6 @@ void Server::kickCommand(std::vector<std::string> & args, User & user)
     if (args.size() < 2 || args.size() > 3) { // без комментария или с комментарием
         throw needMoreParams(user.getNickName(), "KICK");
     }
-    if (!user.getIsOperator()) {
-            //todo:: ERR_CHANOPRIVSNEEDED если не оператор
-    }
     std::vector<std::string> channelsForKick = getReceivers(args.at(0));
     for (int i = 0; i < channelsForKick.size(); i++) {
         Channel *channel = findChannelByName(channelsForKick[i]);
@@ -474,6 +471,9 @@ void Server::kickCommand(std::vector<std::string> & args, User & user)
             // todo: ERR_NOSUCHCHANNEL если нет такого канала
         }
         else {
+            if (!channel->getOperator()) {
+                //todo:: ERR_CHANOPRIVSNEEDED если не оператор
+            }
             std::vector<std::string> receivers = getReceivers(args[1]);
             for (int i = 0; i < receivers.size(); i++) {
                 User *recipientUser = this->findUserByName(receivers.at(i));
@@ -561,7 +561,8 @@ void Server::createChannel(User *user, std::string name) {
 	Channel *channel = new Channel(name);
 	channels.push_back(channel);
 	user->addChannel(channel);
-	channel->setUser(user);// todo: сделат оператором
+	channel->setUser(user);
+    channel->setOperators(user);// todo: сделат оператором
 }
 
 void Server::partCommand(std::vector<std::string> &args, User &user) {

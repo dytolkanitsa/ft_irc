@@ -17,13 +17,13 @@ class Channel;
 
 class Server {
 private:
-	int socketFd;
-	const std::string * host;
-	const std::string & port;
-	const std::string & password;
-	std::vector<pollfd> fds;
-	std::vector<User *> users;
-	std::vector<Channel *> channels;
+	int                     socketFd;
+	const std::string *     host;
+	const std::string &     port;
+	const std::string &     password;
+	std::vector<pollfd>     fds;
+	std::vector<User *>     users;
+	std::vector<Channel *>  channels;
 public:
 
 	Server(const std::string * host, const std::string & port, const std::string & password);
@@ -32,13 +32,13 @@ public:
 	[[noreturn]] void start();
 	void init();
 
-	void acceptProcess();
-	std::string recvMessage(int fd);
+	void                     acceptProcess();
+	std::string              recvMessage(int fd);
 
-	User *findUserByName(const std::string & userName) const;
-	User *findUserByFd(int fd);
-	Channel *findChannelByName(std::string channelName);
-	void commandProcess(User & user, const std::string & message);
+	User                    *findUserByName(const std::string & userName) const;
+	User                    *findUserByFd(int fd);
+	Channel                 *findChannelByName(std::string channelName);
+	void                     commandProcess(User & user, const std::string & message);
 //	Command *findCommandByName(std::string commandName); нужна map
 	std::vector<std::string> setArgs(std::string argString);
 

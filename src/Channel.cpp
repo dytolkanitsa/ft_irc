@@ -3,6 +3,7 @@
 
 
 Channel::Channel(std::string chName) : channelName(chName){
+
 }
 
 Channel::~Channel() {
@@ -16,14 +17,30 @@ std::vector<User *> Channel::getUsers(void) {
 	return users;
 }
 
-/*User*	Channel::getUser(std::string	userName) {
-	for (std::vector<User*>::const_iterator i = users.begin(); i != users.end(); i++)
-	{
-		if ((*i).getNickName() == userName)
-			return (*i);
-	}
-	return nullptr;
-}*/
+void    Channel::setOperators(User *operatorr)
+{
+    this->userOperator = operatorr;
+}
+
+User*    Channel::getOperator()
+{
+//    for (std::vector<User*>::const_iterator i = users.begin(); i != users.end(); i++)
+//	{
+//		if ((*i)->getNickName() == userName)
+//			return (*i);
+//	}
+//	return nullptr;
+    return this->userOperator;
+}
+
+//User*	Channel::getUser(std::string	userName) {
+//	for (std::vector<User*>::const_iterator i = users.begin(); i != users.end(); i++)
+//	{
+//		if ((*i)->getNickName() == userName)
+//			return (*i);
+//	}
+//	return nullptr;
+//}
 
 /*
 bool	Channel::ifUserExist(std::string userName) {
