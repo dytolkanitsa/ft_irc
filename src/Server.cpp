@@ -436,6 +436,8 @@ void Server::joinCommand(std::vector<std::string> & args, User & user) {
 		Channel *channel = findChannelByName(channelsForJoin[i]);
 		if (channel == nullptr){
 			createChannel(&user, channelsForJoin[i]);
+            user.setIsOperator(true); // если канала нет и чел его создает, он оператор
+            //todo: RPL_NOTOPIC , что канал создан
 		} else {
 			user.addChannel(channel);
 			channel->setUser(&user);
