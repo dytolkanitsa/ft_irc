@@ -292,7 +292,7 @@ void Server::commandProcess(User & user, const std::string & message) {
 			this->partCommand(args, user);
 		}
 		// else if (args[0] == "MODE"){}
-		else if (args[0] == "KICK"){
+		else if (command == "KICK"){
             this->kickCommand(args, user);
         }
 		// else if (args[0] == "ADMIN"){}
@@ -444,6 +444,7 @@ void Server::joinCommand(std::vector<std::string> & args, User & user) {
 			user.addChannel(channel);
 			channel->setUser(&user);
 			//todo: message about join
+            std::cout << "пользователь был добавлен в канал нахуй" << std::endl;
 //			channel->sendMessageToChannel(args.at(args.size() - 1), &user);
 		}
 	}
@@ -471,10 +472,12 @@ void Server::kickCommand(std::vector<std::string> & args, User & user)
             std::vector<std::string> receivers = getReceivers(args[1]);
             for (int i = 0; i < receivers.size(); i++) {
                 User *recipientUser = this->findUserByName(receivers.at(i));
-                if (recipientUser != nullptr)
+                if (recipientUser == nullptr)
                     recipientUser->sendMessage(args[args.size() - 1]); // todo: что это такое (взяла из привмсг) ну типа нету такого юзера
                     else {
                         //todo: вывести сообщение, что юзер пошел нахуй с канала нехуй было нарушать правила
+                        std::cout << recipientUser->getNickName() << "был удален с канала" << std::endl;
+//                        channel->sendMessageToChannel("you were kiked nahui", recipientUser);
                         channel->removeUser(recipientUser->getNickName());
                     }
             }
@@ -508,9 +511,9 @@ void	Server::listCommand(std::vector<std::string> & args, User & user)
 	if (!user.getRegistered()) {
         throw connectionRestricted(user.getNickName());
         }
-    if (args.empty()) {
-        throw needMoreParams(user.getNickName(), "LIST");
-    }
+//    if (args.empty()) {
+//        throw needMoreParams(user.getNickName(), "LIST");
+//    }
     std::vector<Channel *> channels_ =  this->getChannels();
     for (std::vector<Channel *>::const_iterator i = channels_.begin(); i != channels_.end(); i++)
     {
