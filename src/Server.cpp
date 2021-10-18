@@ -176,7 +176,6 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 	std::string lastArg;
 	size_t pos = 0;
 	size_t newPos = 0;
-    unsigned long spaceSkip = argString.length() - 3;
 
 	if (argString.empty()){
 		return args;
@@ -185,12 +184,13 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 	if (newPos != std::string::npos){
 		argString = argString.substr(0, newPos);
 	}
+	unsigned long spaceSkip = argString.empty() ? 0 : argString.length() - 1;
 //	unsigned long spaceSkip = argString.length() - 1;
 	while(argString[spaceSkip] == ' ' && spaceSkip != 0){
 		spaceSkip--;
 	}
 	if (spaceSkip != 0){
-		argString = argString.substr(0, spaceSkip + 2);
+		argString = argString.substr(0, spaceSkip + 1);
 	}
 	newPos = argString.find(':', 0);
 	if (newPos != std::string::npos){
@@ -291,7 +291,9 @@ void Server::commandProcess(User & user, const std::string & message) {
 		else if (command == "PART"){
 			this->partCommand(args, user);
 		}
-		// else if (args[0] == "MODE"){}
+		else if (command == "TOPIC"){
+			this->topicCommand(args, user);
+		}
 		else if (command == "KICK"){
             this->kickCommand(args, user);
         }
@@ -447,7 +449,7 @@ void Server::joinCommand(std::vector<std::string> & args, User & user) {
 				channel->setUser(&user);
 			}
 			//todo: message about join
-            std::cout << "пользователь был добавлен в канал нахуй" << channel->getChannelName() << std::endl;
+            throw  "пользователь был добавлен в канал нахуй" +  channel->getChannelName()  ;
 //			channel->sendMessageToChannel(args.at(args.size() - 1), &user);
 		}
 	}
@@ -479,7 +481,7 @@ void Server::kickCommand(std::vector<std::string> & args, User & user)
                     recipientUser->sendMessage(args[args.size() - 1]); // todo: что это такое (взяла из привмсг) ну типа нету такого юзера
                     else {
                         //todo: вывести сообщение, что юзер пошел нахуй с канала нехуй было нарушать правила
-                        std::cout << recipientUser->getNickName() << "был удален с канала" << std::endl;
+                        throw  recipientUser->getNickName() +  "был удален с канала"  ;
 //                        channel->sendMessageToChannel("you were kiked nahui", recipientUser);
                         channel->removeUser(recipientUser->getNickName());
                     }
@@ -587,6 +589,27 @@ void Server::partCommand(std::vector<std::string> &args, User &user) {
 	}
 }
 
+void Server::topicCommand(std::vector<std::string> &args, User &user) {
+	if (!user.getRegistered()){
+		throw connectionRestricted(user.getNickName());
+	}
+	if (args.size() == 1 || args.size() == 2){
+		Channel * channel = this->findChannelByName(args[0]);
+		if (channel != nullptr) {
+			if (channel->ifUserExist(user.getNickName())) {
+				std::string topic = args.size() == 1 ? channel->getTopic() : channel->setGetTopic(args[1]); // если нужно просто получить топик, то мы вызываем просто геттер, но для переутсановки вызывает сеттергеттер
+				throw rplTopic(user.getNickName(), channel->getChannelName(), topic); //если сюда придет пустая строка, то он поймет, что топика нет
+			}
+			else
+				throw notOnChannel(user.getNickName(), channel->getChannelName());
+		} else
+			throw noSuchNick(user.getNickName(), args[0]);
+	} else{
+		throw needMoreParams(user.getNickName(), "TOPIC");
+	}
+
+}
+
 std::vector<Channel *> Server::getChannels()
 {
 	return channels;
@@ -692,3 +715,11 @@ void Server::removeChannel(std::string channelName) {
 		}
 	}
 }
+
+std::string Server::rplTopic(const std::string &nick, const std::string &channel, const std::string& topic) const {
+	if (!topic.empty())
+		return constructReply("332", topic, nick, channel);
+	else
+		return constructReply("331", "No topic is set", nick, channel);
+}
+

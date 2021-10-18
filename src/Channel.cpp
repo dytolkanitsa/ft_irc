@@ -2,7 +2,7 @@
 #include "User.hpp"
 
 
-Channel::Channel(std::string chName) : channelName(chName) {
+Channel::Channel(std::string chName) : channelName(chName){
 }
 
 Channel::~Channel() {
@@ -75,4 +75,17 @@ bool Channel::isEmpty() {
 		return true;
 	}
 	return false;
+}
+
+void Channel::setTopic(std::string newTopic) {
+	this->topic = newTopic;
+}
+
+std::string Channel::getTopic() {
+	return this->topic;
+}
+
+std::string Channel::setGetTopic(std::string newTopic) {
+	this->setTopic(newTopic);
+	return this->getTopic();
 }

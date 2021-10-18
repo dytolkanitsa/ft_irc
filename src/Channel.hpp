@@ -12,6 +12,7 @@ class Channel
 private:
 	std::vector <User *> users;
 	std::string			channelName;
+	std::string			topic;
 
 public:
 	Channel(std::string chName);
@@ -26,7 +27,9 @@ public:
 	void	setUser(User* user);
 	void	sendMessageToChannel(std::string msg, User *sender);
 	void	removeUser(std::string userName);
-
+	void setTopic(std::string newTopic);
+	std::string setGetTopic(std::string newTopic);
+	std::string getTopic();
 };
 
 #endif
