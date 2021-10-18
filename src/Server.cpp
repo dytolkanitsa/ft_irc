@@ -292,7 +292,9 @@ void Server::commandProcess(User & user, const std::string & message) {
 			this->partCommand(args, user);
 		}
 		// else if (args[0] == "MODE"){}
-		else if (args[0] == "KICK"){}
+		else if (args[0] == "KICK"){
+            this->kickCommand(args, user);
+        }
 		// else if (args[0] == "ADMIN"){}
 	} catch (std::string & error) {
 		user.sendMessage(error);
@@ -445,6 +447,39 @@ void Server::joinCommand(std::vector<std::string> & args, User & user) {
 //			channel->sendMessageToChannel(args.at(args.size() - 1), &user);
 		}
 	}
+}
+
+void Server::kickCommand(std::vector<std::string> & args, User & user)
+{
+    if (!user.getRegistered()) {
+        throw connectionRestricted(user.getNickName());
+    }
+    if (args.size() < 2 || args.size() > 3) { // без комментария или с комментарием
+        throw needMoreParams(user.getNickName(), "KICK");
+    }
+    if (!user.getIsOperator()) {
+            //todo:: ERR_CHANOPRIVSNEEDED если не оператор
+    }
+    std::vector<std::string> channelsForKick = getReceivers(args.at(0));
+    for (int i = 0; i < channelsForKick.size(); i++) {
+        Channel *channel = findChannelByName(channelsForKick[i]);
+        if (channel == nullptr)
+        {
+            // todo: ERR_NOSUCHCHANNEL если нет такого канала
+        }
+        else {
+            std::vector<std::string> receivers = getReceivers(args[1]);
+            for (int i = 0; i < receivers.size(); i++) {
+                User *recipientUser = this->findUserByName(receivers.at(i));
+                if (recipientUser != nullptr)
+                    recipientUser->sendMessage(args[args.size() - 1]); // todo: что это такое (взяла из привмсг) ну типа нету такого юзера
+                    else {
+                        //todo: вывести сообщение, что юзер пошел нахуй с канала нехуй было нарушать правила
+                        channel->removeUser(recipientUser->getNickName());
+                    }
+            }
+        }
+    }
 }
 
 void Server::namesCommand(std::vector<std::string> & args, User & user) {

@@ -77,6 +77,7 @@ public:
 	void quitCommand(std::vector<std::string> & args, User & user);
 	void partCommand(std::vector<std::string> & args, User & user);
 
+    void kickCommand(std::vector<std::string> & args, User & user);
 	void createChannel(User *user, std::string name);
 
 	std::vector<Channel *> getChannels();
