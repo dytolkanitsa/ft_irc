@@ -176,6 +176,7 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 	std::string lastArg;
 	size_t pos = 0;
 	size_t newPos = 0;
+    unsigned long spaceSkip = argString.length() - 3;
 
 	if (argString.empty()){
 		return args;
@@ -184,13 +185,12 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 	if (newPos != std::string::npos){
 		argString = argString.substr(0, newPos);
 	}
-
-	unsigned long spaceSkip = argString.length() - 1;
+//	unsigned long spaceSkip = argString.length() - 1;
 	while(argString[spaceSkip] == ' ' && spaceSkip != 0){
 		spaceSkip--;
 	}
-	if (spaceSkip != argString.length() - 1){
-		argString = argString.substr(0, spaceSkip + 1);
+	if (spaceSkip != 0){
+		argString = argString.substr(0, spaceSkip + 2);
 	}
 	newPos = argString.find(':', 0);
 	if (newPos != std::string::npos){
@@ -390,10 +390,11 @@ void Server::privmsgCommand(std::vector<std::string> & args, User & user) {
 				if (channel == nullptr){
 					throw noSuchNick(user.getNickName(), receivers.at(i));
 				}
-				if (channel->ifUserExist(user.getNickName())) /*проверка на тор, чьо юзер вообще есть на канале*/
-					channel->sendMessageToChannel(args.at(args.size() -1), &user);
-				else
-					throw notOnChannel(receivers[i], user.getNickName());
+                channel->sendMessageToChannel(args.at(args.size() -1), &user);
+//				if (channel->ifUserExist(user.getNickName())) /*проверка на тор, чьо юзер вообще есть на канале*/
+//					channel->sendMessageToChannel(args.at(args.size() -1), &user);
+//				else
+//					throw notOnChannel(receivers[i], user.getNickName());
 			}
 		}
 	}
@@ -626,8 +627,10 @@ std::string Server::NoRecipientGiven(const std::string &nick) const {
 }
 
 void Server::removePollfd(int fd) {
-	for (int i = 0; i < this->fds.size(); i++){
-		if (fd == this->fds[i].fd){
+//	for (int i = 0; i < this->fds.size(); i++){
+//		if (fd == this->fds[i].fd){
+    for (int i = 0; i < fds.size(); i++){
+        if (fd == fds[i].fd){
 			this->fds.erase(fds.begin() + i);
 			break;
 		}
