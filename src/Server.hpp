@@ -81,9 +81,6 @@ public:
 	void topicCommand(std:: vector<std::string> & args, User & user);
     void kickCommand(std::vector<std::string> & args, User & user);
 
-    typedef void(Server::*command)(std::vector<std::string> & args, User & user)/* const*/;
-    static command commandsPtr[12];
-
 	Channel * createChannel(User *user, std::string name);
 
 	std::vector<Channel *> getChannels();
