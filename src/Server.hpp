@@ -81,7 +81,7 @@ public:
 	void topicCommand(std:: vector<std::string> & args, User & user);
 
     void kickCommand(std::vector<std::string> & args, User & user);
-	void createChannel(User *user, std::string name);
+	Channel * createChannel(User *user, std::string name);
 
 	std::vector<Channel *> getChannels();
 	void removeUser(User *user);

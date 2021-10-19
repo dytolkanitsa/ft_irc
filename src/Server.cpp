@@ -395,9 +395,8 @@ void Server::privmsgCommand(std::vector<std::string> & args, User & user) {
 				if (channel == nullptr){
 					throw noSuchNick(user.getNickName(), receivers.at(i));
 				}
-                channel->sendMessageToChannel(args.at(args.size() -1), &user);
 				if (channel->ifUserExist(user.getNickName())) /*проверка на тор, чьо юзер вообще есть на канале*/
-					channel->sendMessageToChannel(args.at(args.size() -1), &user);
+					channel->sendMessageToChannel(constructMessage(user.getNickName(), "PRIVMSG", channel->getChannelName(), args.at(args.size() -1)), &user);
 				else
 					throw notOnChannel(receivers[i], user.getNickName());
 			}
@@ -437,10 +436,10 @@ void Server::joinCommand(std::vector<std::string> & args, User & user) {
 		throw needMoreParams(user.getNickName(), "JOIN");
 	}
 	std::vector<std::string> channelsForJoin = getReceivers(args.at(0));
-	for (int i = 0; i < channelsForJoin.size(); i++){
+	for (int i = 0; i < channelsForJoin.size(); i++) {
 		Channel *channel = findChannelByName(channelsForJoin[i]);
 		if (channel == nullptr){
-			createChannel(&user, channelsForJoin[i]);
+			channel = createChannel(&user, channelsForJoin[i]);
 //            user.sendMessage("332 *" + channelsForJoin[i] + ": No topic is set\r\n"); todo topic
 		} else {
 			if (!channel->ifUserExist(user.getNickName()))
@@ -450,6 +449,8 @@ void Server::joinCommand(std::vector<std::string> & args, User & user) {
 			}
 //            channel->sendMessageToChannel( user.getNickName() + " joined the channel", &user);
 		}
+		user.sendMessage(this->constructMessage(user.getNickName(), "JOIN", channel->getChannelName()));
+		channel->sendMessageToChannel(this->constructMessage(user.getNickName(), "JOIN", channel->getChannelName()), &user);
 	}
 }
 
@@ -553,12 +554,13 @@ void Server::awayCommand(std::vector<std::string> & args, User & user) {
  * @param user пользователь создавший канал
  * @param name имя канала
  */
-void Server::createChannel(User *user, std::string name) {
+Channel * Server::createChannel(User *user, std::string name) {
 	Channel *channel = new Channel(name);
 	channels.push_back(channel);
 	user->addChannel(channel);
 	channel->setUser(user);
-    channel->setOperators(user);
+	channel->setOperators(user);
+	return channel;
 }
 
 void Server::partCommand(std::vector<std::string> &args, User &user) {
