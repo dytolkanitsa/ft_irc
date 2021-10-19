@@ -64,7 +64,6 @@ public:
 	std::string awayMessageHaveBeenUnset(const std::string &nick) const;
 	std::string notOnChannel(const std::string &nick, const std::string &channel) const;
 	std::string rplTopic(const std::string &nick, const std::string &channel, const std::string& topic) const;
-//	std::string rplNoTopic(const std::string &nick, const std::string &channel) const;
 
 	// Commands
 	void passCommand(std::vector<std::string> & args, User & user) const;
@@ -75,7 +74,6 @@ public:
     void listCommand(std::vector<std::string> & args, User & user);
     void awayCommand(std::vector<std::string> & args, User & user);
     void joinCommand(std::vector<std::string> & args, User & user);
-//	void namesCommand(std::vector<std::string> & args, User & user);
 	void quitCommand(std::vector<std::string> & args, User & user);
 	void partCommand(std::vector<std::string> & args, User & user);
 	void topicCommand(std:: vector<std::string> & args, User & user);
