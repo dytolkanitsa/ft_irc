@@ -506,10 +506,10 @@ void	Server::listCommand(std::vector<std::string> & args, User & user)
 {
 	if (!user.getRegistered()) {
         throw connectionRestricted(user.getNickName());
-        }
-    if (args.empty()) {
-        throw needMoreParams(user.getNickName(), "LIST");
     }
+//    if (args.empty()) {
+//        throw needMoreParams(user.getNickName(), "LIST");
+//    }
 	std::string channelsList;
     for (int i = 0; i != channels.size(); i++)
     {
