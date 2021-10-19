@@ -5,7 +5,7 @@
 #include "Channel.hpp"
 #include "User.hpp"
 
-User::User(int socketFd) : socketFd(socketFd), registered(false), enterPassword(false), nickName("*"){}
+User::User(int socketFd) : socketFd(socketFd), registered(false), enterPassword(false), nickName("*"), enterNick(false) {}
 
 User::~User() {
 }

@@ -176,7 +176,6 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 	std::string lastArg;
 	size_t pos = 0;
 	size_t newPos = 0;
-    unsigned long spaceSkip = argString.length() - 3;
 
 	if (argString.empty()){
 		return args;
@@ -185,6 +184,7 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 	if (newPos != std::string::npos){
 		argString = argString.substr(0, newPos);
 	}
+    unsigned long spaceSkip = argString.length() - 3;
 //	unsigned long spaceSkip = argString.empty() ? 0 : argString.length() - 1;
 //	unsigned long spaceSkip = argString.length() - 1;
 	while(argString[spaceSkip] == ' ' && spaceSkip != 0){
@@ -316,6 +316,8 @@ void Server::passCommand(std::vector<std::string> & args, User & user) const {
 }
 
 void Server::userCommand(std::vector<std::string> & args, User & user) const {
+    if (!user.getEnterNick())
+        throw user.getNickName() + "Enter your nick first!";
 	if (args.size() != 4) {
 		throw needMoreParams(user.getNickName(), "USER");
 	}
@@ -328,6 +330,8 @@ void Server::userCommand(std::vector<std::string> & args, User & user) const {
 }
 
 void Server::nickCommand(std::vector<std::string> & args, User & user) const {
+    if (!user.getEnterPassword())
+        throw user.getNickName() + "Enter your pass first!";
 	std::string prevNick = user.getNickName();
 	if (args.empty()) {
 		throw needMoreParams(user.getNickName(), "NICK");
@@ -337,6 +341,7 @@ void Server::nickCommand(std::vector<std::string> & args, User & user) const {
 	}
 	user.setNickName(args[0]);
 	user.sendMessage(this->constructMessage(prevNick, "NICK", user.getNickName()));
+    user.setEnterNick(true);
 }
 
 /**
@@ -721,4 +726,5 @@ std::string Server::rplTopic(const std::string &nick, const std::string &channel
 	else
 		return constructReply("331", "No topic is set", nick, channel);
 }
+
 

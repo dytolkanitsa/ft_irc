@@ -21,6 +21,7 @@ private:
 	std::string             password;
 	std::string	            awayMessage;
 	bool	                enterPassword;
+    bool                    enterNick;
 	bool	                registered;
 	std::vector<Channel *>  channels;
 
@@ -36,6 +37,7 @@ public:
 	std::string		getPassword();
 
 	bool	        getEnterPassword() const {return enterPassword;} // 7
+    bool            getEnterNick() const {return enterNick;}
 	bool        	getRegistered() const {return registered;} // 8
 
 	void        	setNickName(const std::string & nickName);
@@ -46,6 +48,7 @@ public:
 	void 	        removeOperator();
 	void	        setEnterPassword(bool param) {enterPassword = param;} // 7
 	void	        setRegistered(bool param) {registered = param;} // 8
+    void            setEnterNick(bool param) {enterNick = param;}
 
 	void	        addChannel(Channel *channel);
 
