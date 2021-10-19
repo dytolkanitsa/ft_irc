@@ -175,23 +175,26 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 	std::vector<std::string> args;
 	std::string lastArg;
 	size_t pos = 0;
-	size_t newPos = 0;
+	size_t newPos;
 
-	if (argString.empty()){
-		return args;
-	}
 	newPos = argString.find("\r\n");
 	if (newPos != std::string::npos){
 		argString = argString.substr(0, newPos);
+	} else{
+		newPos = argString.find('\n');
+		if (newPos != std::string::npos){
+			argString = argString.substr(0, newPos);
+		}
 	}
-    unsigned long spaceSkip = argString.length() - 3;
-//	unsigned long spaceSkip = argString.empty() ? 0 : argString.length() - 1;
-//	unsigned long spaceSkip = argString.length() - 1;
+	if (argString.empty()){
+		return args;
+	}
+	unsigned long spaceSkip = argString.length() - 1;
 	while(argString[spaceSkip] == ' ' && spaceSkip != 0){
 		spaceSkip--;
 	}
 	if (spaceSkip != 0){
-		argString = argString.substr(0, spaceSkip + 2);
+		argString = argString.substr(0, spaceSkip + 1);
 	}
 	newPos = argString.find(':', 0);
 	if (newPos != std::string::npos){
@@ -283,9 +286,9 @@ void Server::commandProcess(User & user, const std::string & message) {
 		else if (command == "AWAY"){
 			this->awayCommand(args, user);
 		}
-		else if (command == "NAMES"){
-			this->namesCommand(args, user);
-		}
+//		else if (command == "NAMES"){
+//			this->namesCommand(args, user);
+//		}
 		else if (command == "QUIT"){
 			this->quitCommand(args, user);
 		}
@@ -445,15 +448,14 @@ void Server::joinCommand(std::vector<std::string> & args, User & user) {
 		Channel *channel = findChannelByName(channelsForJoin[i]);
 		if (channel == nullptr){
 			channel = createChannel(&user, channelsForJoin[i]);
-//            user.sendMessage("332 *" + channelsForJoin[i] + ": No topic is set\r\n"); todo topic
 		} else {
 			if (!channel->ifUserExist(user.getNickName()))
 			{
 				user.addChannel(channel);
 				channel->setUser(&user);
 			}
-//            channel->sendMessageToChannel( user.getNickName() + " joined the channel", &user);
 		}
+		user.sendMessage(rplTopic(user.getNickName(), channel->getChannelName(), channel->getTopic()));
 		user.sendMessage(this->constructMessage(user.getNickName(), "JOIN", channel->getChannelName()));
 		channel->sendMessageToChannel(this->constructMessage(user.getNickName(), "JOIN", channel->getChannelName()), &user);
 	}
@@ -472,11 +474,11 @@ void Server::kickCommand(std::vector<std::string> & args, User & user)
         Channel *channel = findChannelByName(channelsForKick[i]);
         if (channel == nullptr)
         {
-            user.sendMessage("403 *" + channelsForKick[i] + " :No such channel\r\n");
+            user.sendMessage("403 *" + channelsForKick[i] + " :No such channel");
         }
         else {
             if (!channel->getOperator()) {
-                user.sendMessage("482 *" + channelsForKick[i] + " :You're not channel operator\r\n");
+                user.sendMessage("482 *" + channelsForKick[i] + " :You're not channel operator");
             }
             std::vector<std::string> receivers = getReceivers(args[1]);
             for (int i = 0; i < receivers.size(); i++) {
@@ -492,41 +494,42 @@ void Server::kickCommand(std::vector<std::string> & args, User & user)
     }
 }
 
-void Server::namesCommand(std::vector<std::string> & args, User & user) {
-	if (!user.getRegistered()) {
-		throw connectionRestricted(user.getNickName());
-	}
-	if (args.empty()) {
-		throw needMoreParams(user.getNickName(), "NAMES");
-	}
-	if (args.size() > 1) {
-		std::vector<std::string> namesChannels = getReceivers(args.at(1));
-		for (int i = 1; i < namesChannels.size(); i++ ){
-			Channel *channel = findChannelByName(namesChannels[i]);
-			if (channel != nullptr) {
-				//todo: вывести пльзователей
-			}
-		}
-	}
-}
+//void Server::namesCommand(std::vector<std::string> & args, User & user) {
+//	if (!user.getRegistered()) {
+//		throw connectionRestricted(user.getNickName());
+//	}
+//	if (args.empty()) {
+//		throw needMoreParams(user.getNickName(), "NAMES");
+//	}
+//	if (args.size() > 1) {
+//		std::vector<std::string> namesChannels = getReceivers(args.at(1));
+//		for (int i = 1; i < namesChannels.size(); i++ ){
+//			Channel *channel = findChannelByName(namesChannels[i]);
+//			if (channel != nullptr) {
+//				//todo: вывести пльзователей
+//			}
+//		}
+//	}
+//}
 
 /*
-выводит список каналов на сервере (и их топиков, но мы это опустим)
+выводит список каналов на сервере
 */
 void	Server::listCommand(std::vector<std::string> & args, User & user)
 {
 	if (!user.getRegistered()) {
         throw connectionRestricted(user.getNickName());
         }
-//    if (args.empty()) {
-//        throw needMoreParams(user.getNickName(), "LIST");
-//    }
-    std::vector<Channel *> channels_ =  this->getChannels();
-    for (std::vector<Channel *>::const_iterator i = channels_.begin(); i != channels_.end(); i++)
-    {
-        user.sendMessage((*i)->getChannelName());
+    if (args.empty()) {
+        throw needMoreParams(user.getNickName(), "LIST");
     }
-    user.sendMessage("323* :End of LIST\r\n"); // 323* :End of LIST ???
+	std::string channelsList;
+    for (int i = 0; i != channels.size(); i++)
+    {
+    	channelsList += channels[i]->getChannelName() + "\t\t:" + channels[i]->getTopic() + '\n';
+    }
+    user.sendMessage(channelsList);
+    user.sendMessage("323* :End of LIST"); // 323* :End of LIST ???
 }
 
 /*

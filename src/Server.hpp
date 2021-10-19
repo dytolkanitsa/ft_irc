@@ -75,7 +75,7 @@ public:
     void listCommand(std::vector<std::string> & args, User & user);
     void awayCommand(std::vector<std::string> & args, User & user);
     void joinCommand(std::vector<std::string> & args, User & user);
-	void namesCommand(std::vector<std::string> & args, User & user);
+//	void namesCommand(std::vector<std::string> & args, User & user);
 	void quitCommand(std::vector<std::string> & args, User & user);
 	void partCommand(std::vector<std::string> & args, User & user);
 	void topicCommand(std:: vector<std::string> & args, User & user);
