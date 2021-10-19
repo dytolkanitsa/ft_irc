@@ -441,14 +441,14 @@ void Server::joinCommand(std::vector<std::string> & args, User & user) {
 		Channel *channel = findChannelByName(channelsForJoin[i]);
 		if (channel == nullptr){
 			createChannel(&user, channelsForJoin[i]);
-            user.sendMessage("332 *" + channelsForJoin[i] + ": No topic is set\r\n");
+//            user.sendMessage("332 *" + channelsForJoin[i] + ": No topic is set\r\n"); todo topic
 		} else {
 			if (!channel->ifUserExist(user.getNickName()))
 			{
 				user.addChannel(channel);
 				channel->setUser(&user);
 			}
-			channel->sendMessageToChannel( user.getNickName() + " joined the channel", &user);
+//            channel->sendMessageToChannel( user.getNickName() + " joined the channel", &user);
 		}
 	}
 }
@@ -470,7 +470,7 @@ void Server::kickCommand(std::vector<std::string> & args, User & user)
         }
         else {
             if (!channel->getOperator()) {
-                user.sendMessage("482 *" + channelsForKick[i] + " :You're not channel operator\r\n")
+                user.sendMessage("482 *" + channelsForKick[i] + " :You're not channel operator\r\n");
             }
             std::vector<std::string> receivers = getReceivers(args[1]);
             for (int i = 0; i < receivers.size(); i++) {
@@ -479,7 +479,7 @@ void Server::kickCommand(std::vector<std::string> & args, User & user)
                     recipientUser->sendMessage(args[args.size() - 1]);
                     else {
                         channel->removeUser(recipientUser->getNickName());
-                        channel->sendMessageToChannel(recipientUser->getNickName() + " was kicked from channel", recipientUser);
+//                        channel->sendMessageToChannel(recipientUser->getNickName() + " was kicked from channel", recipientUser);
                     }
             }
         }
