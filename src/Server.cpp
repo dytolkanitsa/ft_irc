@@ -390,8 +390,6 @@ void Server::privmsgCommand(std::vector<std::string> & args, User & user) {
 			if (recipientUser != nullptr) {
 				recipientUser->sendMessage(constructMessage(user.getNickName(), "PRIVMSG", recipientUser->getNickName(), args[args.size() - 1]));
 				if (!recipientUser->getAwayMessage().empty()) { //away message
-					// выкидываем юзеру away message другого юзера
-//					recipientUser->sendMessage(constructReply(recipientUser->getNickName(), "PRIVMSG", user.getNickName(), recipientUser->getAwayMessage()));
 					user.sendMessage(rplAway(user.getNickName(), recipientUser->getNickName(), recipientUser->getAwayMessage()));
 				}
 			} else {
@@ -422,11 +420,14 @@ void	Server::noticeCommand(std::vector<std::string> & args, User & user) {
 			if (recipientUser != nullptr){
 				recipientUser->sendMessage(args[args.size() - 1]);
 			} else{
-				Channel *channel = this->findChannelByName(receivers.at(i));
-				if (channel == nullptr){
-					recipientUser->sendMessage(rplAway(user.getNickName(), recipientUser->getNickName(), recipientUser->getAwayMessage()));
-				}
-				channel->sendMessageToChannel(args.at(args.size() -1), &user);
+                Channel *channel = this->findChannelByName(receivers.at(i));
+                if (channel == nullptr){
+                    throw noSuchNick(user.getNickName(), receivers.at(i));
+                }
+                if (channel->ifUserExist(user.getNickName())) /*проверка на тор, чьо юзер вообще есть на канале*/
+                    channel->sendMessageToChannel(constructMessage(user.getNickName(), "PRIVMSG", channel->getChannelName(), args.at(args.size() -1)), &user);
+                else
+                    throw notOnChannel(receivers[i], user.getNickName());
 			}
 		}
 	}
@@ -462,7 +463,7 @@ void Server::kickCommand(std::vector<std::string> & args, User & user)
     if (!user.getRegistered()) {
         throw connectionRestricted(user.getNickName());
     }
-    if (args.size() < 2 || args.size() > 3) { // без комментария или с комментарием
+    if (args.size() != 2) {
         throw needMoreParams(user.getNickName(), "KICK");
     }
     std::vector<std::string> channelsForKick = getReceivers(args.at(0));
@@ -470,11 +471,12 @@ void Server::kickCommand(std::vector<std::string> & args, User & user)
         Channel *channel = findChannelByName(channelsForKick[i]);
         if (channel == nullptr)
         {
-            user.sendMessage("403 *" + channelsForKick[i] + " :No such channel");
+            throw "403 * " + channelsForKick[i] + " :No such channel";
         }
         else {
-            if (!channel->getOperator()) {
-                user.sendMessage("482 *" + channelsForKick[i] + " :You're not channel operator");
+            if (!channel->getOperator(&user)) {
+//                user.sendMessage("482 *" + channelsForKick[i] + " :You're not channel operator");
+                    throw "482 * " + channelsForKick[i] + " :You're not channel operator";
             }
             std::vector<std::string> receivers = getReceivers(args[1]);
             for (int i = 0; i < receivers.size(); i++) {

@@ -22,9 +22,12 @@ void    Channel::setOperators(User *operatorr)
     this->userOperator = operatorr;
 }
 
-User*    Channel::getOperator()
+User*    Channel::getOperator(User *user)
 {
-    return this->userOperator;
+    if (userOperator == user)
+        return this->userOperator;
+    else
+        return nullptr;
 }
 
 //User*	Channel::getUser(std::string	userName) {
