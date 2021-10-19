@@ -24,6 +24,9 @@ private:
 	std::vector<pollfd>     fds;
 	std::vector<User *>     users;
 	std::vector<Channel *>  channels;
+	typedef void(Server::*command)(std::vector<std::string> & args, User & user);
+	std::vector<command> commands;
+	std::vector<std::string> commandsName;
 public:
 
 	Server(const std::string * host, const std::string & port, const std::string & password);
@@ -77,9 +80,6 @@ public:
 	void partCommand(std::vector<std::string> & args, User & user);
 	void topicCommand(std:: vector<std::string> & args, User & user);
     void kickCommand(std::vector<std::string> & args, User & user);
-
-    typedef void(Server::*command)(std::vector<std::string> & args, User & user)/* const*/;
-    static command commandsPtr[12];
 
 	Channel * createChannel(User *user, std::string name);
 
