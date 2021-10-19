@@ -39,7 +39,6 @@ public:
 	User                    *findUserByFd(int fd);
 	Channel                 *findChannelByName(std::string channelName);
 	void                     commandProcess(User & user, const std::string & message);
-//	Command *findCommandByName(std::string commandName); нужна map
 	std::vector<std::string> setArgs(std::string argString);
 
 	// Replies
@@ -66,9 +65,9 @@ public:
 	std::string rplTopic(const std::string &nick, const std::string &channel, const std::string& topic) const;
 
 	// Commands
-	void passCommand(std::vector<std::string> & args, User & user) const;
-	void userCommand(std::vector<std::string> & args, User & user) const;
-	void nickCommand(std::vector<std::string> & args, User & user) const;
+	void passCommand(std::vector<std::string> & args, User & user)/* const*/;
+	void userCommand(std::vector<std::string> & args, User & user)/* const*/;
+	void nickCommand(std::vector<std::string> & args, User & user)/* const*/;
     void privmsgCommand(std::vector<std::string> & args, User & user);
     void noticeCommand(std::vector<std::string> & args, User & user);
     void listCommand(std::vector<std::string> & args, User & user);
@@ -77,8 +76,11 @@ public:
 	void quitCommand(std::vector<std::string> & args, User & user);
 	void partCommand(std::vector<std::string> & args, User & user);
 	void topicCommand(std:: vector<std::string> & args, User & user);
-
     void kickCommand(std::vector<std::string> & args, User & user);
+
+    typedef void(Server::*command)(std::vector<std::string> & args, User & user)/* const*/;
+    static command commandsPtr[12];
+
 	Channel * createChannel(User *user, std::string name);
 
 	std::vector<Channel *> getChannels();

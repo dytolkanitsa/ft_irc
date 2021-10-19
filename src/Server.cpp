@@ -255,14 +255,23 @@ User *Server::findUserByFd(int fd) {
  * @param user указатель на юзера, который отправил сообщение
  */
 void Server::commandProcess(User & user, const std::string & message) {
+	command commandsPtr[12] = {&Server::passCommand, &Server::userCommand, &Server::nickCommand, &Server::privmsgCommand, &Server::joinCommand, &Server::listCommand, &Server::noticeCommand, &Server::awayCommand, &Server::quitCommand, &Server::partCommand, &Server::topicCommand, &Server::kickCommand};
+	std::string commandsName[12] = {"PASS", "USER", "NICK", "PRIVMSG", "JOIN", "LIST", "NOTICE", "AWAY", "QUIT", "PART", "TOPIC", "KICK"};
+
 	std::vector<std::string> args = setArgs(message);
 	if (args.empty()){
 		return;
 	}
+	std::string command = args[0];
+	args.erase(args.begin());
 	try {
-		std::string command = args[0];
-		args.erase(args.begin());
-		if (command == "PASS") {
+		for (int i = 0; i < 12; i++){
+			if (command == commandsName[i]){
+			(this->*commandsPtr[i])(args, user);
+				break;
+			}
+		}
+		/*if (command == "PASS") {
 			this->passCommand(args, user);
 		}
 		else if (command == "USER") {
@@ -297,13 +306,13 @@ void Server::commandProcess(User & user, const std::string & message) {
 		}
 		else if (command == "KICK"){
             this->kickCommand(args, user);
-        }
+        }*/
 	} catch (std::string & error) {
 		user.sendMessage(error);
 	}
 }
 
-void Server::passCommand(std::vector<std::string> & args, User & user) const {
+void Server::passCommand(std::vector<std::string> & args, User & user)/* const*/ {
 	if (user.getEnterPassword())
 		throw alreadyRegistered(user.getNickName());
 	if (args.empty())
@@ -314,7 +323,7 @@ void Server::passCommand(std::vector<std::string> & args, User & user) const {
 	user.setEnterPassword(true);
 }
 
-void Server::userCommand(std::vector<std::string> & args, User & user) const {
+void Server::userCommand(std::vector<std::string> & args, User & user)/* const*/ {
 	if (args.size() != 4) {
 		throw needMoreParams(user.getNickName(), "USER");
 	}
@@ -326,7 +335,7 @@ void Server::userCommand(std::vector<std::string> & args, User & user) const {
 	user.sendMessage(welcomeMsg(user.getNickName()));
 }
 
-void Server::nickCommand(std::vector<std::string> & args, User & user) const {
+void Server::nickCommand(std::vector<std::string> & args, User & user)/* const*/ {
 	std::string prevNick = user.getNickName();
 	if (args.empty()) {
 		throw needMoreParams(user.getNickName(), "NICK");
