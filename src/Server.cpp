@@ -286,9 +286,6 @@ void Server::commandProcess(User & user, const std::string & message) {
 		else if (command == "AWAY"){
 			this->awayCommand(args, user);
 		}
-		else if (command == "NAMES"){
-			this->namesCommand(args, user);
-		}
 		else if (command == "QUIT"){
 			this->quitCommand(args, user);
 		}
@@ -301,7 +298,6 @@ void Server::commandProcess(User & user, const std::string & message) {
 		else if (command == "KICK"){
             this->kickCommand(args, user);
         }
-		// else if (args[0] == "ADMIN"){}
 	} catch (std::string & error) {
 		user.sendMessage(error);
 	}
@@ -482,29 +478,10 @@ void Server::kickCommand(std::vector<std::string> & args, User & user)
                     recipientUser->sendMessage(args[args.size() - 1]);
                     else {
                         channel->removeUser(recipientUser->getNickName());
-//                        channel->sendMessageToChannel(recipientUser->getNickName() + " was kicked from channel", recipientUser);
                     }
             }
         }
     }
-}
-
-void Server::namesCommand(std::vector<std::string> & args, User & user) {
-	if (!user.getRegistered()) {
-		throw connectionRestricted(user.getNickName());
-	}
-	if (args.empty()) {
-		throw needMoreParams(user.getNickName(), "NAMES");
-	}
-	if (args.size() > 1) {
-		std::vector<std::string> namesChannels = getReceivers(args.at(1));
-		for (int i = 1; i < namesChannels.size(); i++ ){
-			Channel *channel = findChannelByName(namesChannels[i]);
-			if (channel != nullptr) {
-				//todo: вывести пльзователей
-			}
-		}
-	}
 }
 
 /*
@@ -523,8 +500,9 @@ void	Server::listCommand(std::vector<std::string> & args, User & user)
     {
     	channelsList += channels[i]->getChannelName() + "\t\t:" + channels[i]->getTopic() + '\n';
     }
+    channelsList.erase(channelsList.length() -1);
     user.sendMessage(channelsList);
-    user.sendMessage("323* :End of LIST"); // 323* :End of LIST ???
+    user.sendMessage("323* :End of LIST");
 }
 
 /*
@@ -539,7 +517,7 @@ void Server::awayCommand(std::vector<std::string> & args, User & user) {
 	}
 	else {
 		if (args.size() == 1) {
-			std::string awayMessage = args[0]; // там же текст
+			std::string awayMessage = args[0];
 			user.setAwayMessage(awayMessage);
 			throw awayMessageHaveBeenSet(user.getNickName());
 		}
