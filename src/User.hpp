@@ -32,18 +32,18 @@ public:
 
 	std::string 	getNickName() /*const*/;
 	int 			getSocketFd() /*const*/;
-//	std::string 	getRealName();
-//	std::string		getPassword();
+	std::string 	getRealName();
+	std::string		getPassword();
 
 	bool	        getEnterPassword() const {return enterPassword;} // 7
 	bool        	getRegistered() const {return registered;} // 8
 
 	void        	setNickName(const std::string & nickName);
-//	void        	setSocketFd(int socket);
+	void        	setSocketFd(int socket);
 	void        	setRealName(const std::string & realName);;
-//	void	        setPassword(const std::string & pass);
-//	void 	        makeOperator();
-//	void 	        removeOperator();
+	void	        setPassword(const std::string & pass);
+	void 	        makeOperator();
+	void 	        removeOperator();
 	void	        setEnterPassword(bool param) {enterPassword = param;} // 7
 	void	        setRegistered(bool param) {registered = param;} // 8
 

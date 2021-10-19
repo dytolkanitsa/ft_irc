@@ -441,16 +441,14 @@ void Server::joinCommand(std::vector<std::string> & args, User & user) {
 		Channel *channel = findChannelByName(channelsForJoin[i]);
 		if (channel == nullptr){
 			createChannel(&user, channelsForJoin[i]);
-            //todo: RPL_NOTOPIC , что канал создан
+            user.sendMessage("332 *" + channelsForJoin[i] + ": No topic is set\r\n");
 		} else {
 			if (!channel->ifUserExist(user.getNickName()))
 			{
 				user.addChannel(channel);
 				channel->setUser(&user);
 			}
-			//todo: message about join
-            throw  "пользователь был добавлен в канал нахуй" +  channel->getChannelName()  ;
-//			channel->sendMessageToChannel(args.at(args.size() - 1), &user);
+			channel->sendMessageToChannel( user.getNickName() + " joined the channel", &user);
 		}
 	}
 }
@@ -468,22 +466,20 @@ void Server::kickCommand(std::vector<std::string> & args, User & user)
         Channel *channel = findChannelByName(channelsForKick[i]);
         if (channel == nullptr)
         {
-            // todo: ERR_NOSUCHCHANNEL если нет такого канала
+            user.sendMessage("403 *" + channelsForKick[i] + " :No such channel\r\n");
         }
         else {
             if (!channel->getOperator()) {
-                //todo:: ERR_CHANOPRIVSNEEDED если не оператор
+                user.sendMessage("482 *" + channelsForKick[i] + " :You're not channel operator\r\n")
             }
             std::vector<std::string> receivers = getReceivers(args[1]);
             for (int i = 0; i < receivers.size(); i++) {
                 User *recipientUser = this->findUserByName(receivers.at(i));
                 if (recipientUser == nullptr)
-                    recipientUser->sendMessage(args[args.size() - 1]); // todo: что это такое (взяла из привмсг) ну типа нету такого юзера
+                    recipientUser->sendMessage(args[args.size() - 1]);
                     else {
-                        //todo: вывести сообщение, что юзер пошел нахуй с канала нехуй было нарушать правила
-                        throw  recipientUser->getNickName() +  "был удален с канала"  ;
-//                        channel->sendMessageToChannel("you were kiked nahui", recipientUser);
                         channel->removeUser(recipientUser->getNickName());
+                        channel->sendMessageToChannel(recipientUser->getNickName() + " was kicked from channel", recipientUser);
                     }
             }
         }
@@ -524,7 +520,7 @@ void	Server::listCommand(std::vector<std::string> & args, User & user)
     {
         user.sendMessage((*i)->getChannelName());
     }
-    user.sendMessage("End of LIST\r\n"); // 323* :End of LIST ???
+    user.sendMessage("323* :End of LIST\r\n"); // 323* :End of LIST ???
 }
 
 /*
@@ -538,12 +534,12 @@ void Server::awayCommand(std::vector<std::string> & args, User & user) {
 		throw connectionRestricted(user.getNickName());
 	}
 	else {
-		if (args.size() == 1) { // если есть какой-то аргумент, то устанавливаем away мессаге
+		if (args.size() == 1) {
 			std::string awayMessage = args[0]; // там же текст
 			user.setAwayMessage(awayMessage);
 			throw awayMessageHaveBeenSet(user.getNickName());
 		}
-		else { // хотим снять away message, устанавливаем типа ничего в сет и хо то во
+		else {
             if (args.empty()) {
                 user.setAwayMessage("");
                 throw awayMessageHaveBeenUnset(user.getNickName());
@@ -562,7 +558,7 @@ void Server::createChannel(User *user, std::string name) {
 	channels.push_back(channel);
 	user->addChannel(channel);
 	channel->setUser(user);
-    channel->setOperators(user);// todo: сделат оператором
+    channel->setOperators(user);
 }
 
 void Server::partCommand(std::vector<std::string> &args, User &user) {

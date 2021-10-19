@@ -5,7 +5,7 @@
 #include "Channel.hpp"
 #include "User.hpp"
 
-User::User(int socketFd) : socketFd(socketFd), registered(false), enterPassword(false), isOperator(false), nickName("*"){}
+User::User(int socketFd) : socketFd(socketFd), registered(false), enterPassword(false), nickName("*"){}
 
 User::~User() {
 }
@@ -40,14 +40,6 @@ void User::setPassword(const std::string & pass) {
 
 std::string User::getPassword() {
 	return this->password;
-}
-
-void User::makeOperator() {
-	this->isOperator = true;
-}
-
-void User::removeOperator() {
-	this->isOperator = false;
 }
 
 void User::sendMessage(std::string msg)/* const*/ {

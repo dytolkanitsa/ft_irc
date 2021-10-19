@@ -24,12 +24,6 @@ void    Channel::setOperators(User *operatorr)
 
 User*    Channel::getOperator()
 {
-//    for (std::vector<User*>::const_iterator i = users.begin(); i != users.end(); i++)
-//	{
-//		if ((*i)->getNickName() == userName)
-//			return (*i);
-//	}
-//	return nullptr;
     return this->userOperator;
 }
 

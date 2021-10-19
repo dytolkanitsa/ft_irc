@@ -20,8 +20,8 @@ public:
 	virtual             ~Channel();
 
 	std::string			getChannelName(void);
-//	std::vector<User *>	getUsers(void);
-//	User*				getUser(std::string	userName);
+	std::vector<User *>	getUsers(void);
+	User*				getUser(std::string	userName);
 
 	bool	            ifUserExist(std::string userName);
 	bool                isEmpty();
