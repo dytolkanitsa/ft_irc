@@ -175,23 +175,26 @@ std::vector<std::string> Server::setArgs(std::string argString) {
 	std::vector<std::string> args;
 	std::string lastArg;
 	size_t pos = 0;
-	size_t newPos = 0;
-    unsigned long spaceSkip = argString.length() - 3;
+	size_t newPos;
 
-	if (argString.empty()){
-		return args;
-	}
 	newPos = argString.find("\r\n");
 	if (newPos != std::string::npos){
 		argString = argString.substr(0, newPos);
+	} else{
+		newPos = argString.find('\n');
+		if (newPos != std::string::npos){
+			argString = argString.substr(0, newPos);
+		}
 	}
-//	unsigned long spaceSkip = argString.empty() ? 0 : argString.length() - 1;
-//	unsigned long spaceSkip = argString.length() - 1;
+	if (argString.empty()){
+		return args;
+	}
+	unsigned long spaceSkip = argString.length() - 1;
 	while(argString[spaceSkip] == ' ' && spaceSkip != 0){
 		spaceSkip--;
 	}
 	if (spaceSkip != 0){
-		argString = argString.substr(0, spaceSkip + 2);
+		argString = argString.substr(0, spaceSkip + 1);
 	}
 	newPos = argString.find(':', 0);
 	if (newPos != std::string::npos){
