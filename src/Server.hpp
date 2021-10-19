@@ -24,6 +24,9 @@ private:
 	std::vector<pollfd>     fds;
 	std::vector<User *>     users;
 	std::vector<Channel *>  channels;
+	typedef void(Server::*command)(std::vector<std::string> & args, User & user);
+	std::vector<command> commands;
+	std::vector<std::string> commandsName;
 public:
 
 	Server(const std::string * host, const std::string & port, const std::string & password);

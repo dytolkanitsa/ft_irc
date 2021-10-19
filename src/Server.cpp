@@ -17,6 +17,8 @@
 
 Server::Server(const std::string *host, const std::string &port, const std::string &password)
 : host(nullptr), port(port), password(password), socketFd(-1) {
+	commands = {&Server::passCommand, &Server::userCommand, &Server::nickCommand, &Server::privmsgCommand, &Server::joinCommand, &Server::listCommand, &Server::noticeCommand, &Server::awayCommand, &Server::quitCommand, &Server::partCommand, &Server::topicCommand, &Server::kickCommand};
+	commandsName = {"PASS", "USER", "NICK", "PRIVMSG", "JOIN", "LIST", "NOTICE", "AWAY", "QUIT", "PART", "TOPIC", "KICK"};
 }
 
 /**
@@ -255,8 +257,6 @@ User *Server::findUserByFd(int fd) {
  * @param user указатель на юзера, который отправил сообщение
  */
 void Server::commandProcess(User & user, const std::string & message) {
-	command commandsPtr[12] = {&Server::passCommand, &Server::userCommand, &Server::nickCommand, &Server::privmsgCommand, &Server::joinCommand, &Server::listCommand, &Server::noticeCommand, &Server::awayCommand, &Server::quitCommand, &Server::partCommand, &Server::topicCommand, &Server::kickCommand};
-	std::string commandsName[12] = {"PASS", "USER", "NICK", "PRIVMSG", "JOIN", "LIST", "NOTICE", "AWAY", "QUIT", "PART", "TOPIC", "KICK"};
 
 	std::vector<std::string> args = setArgs(message);
 	if (args.empty()){
@@ -266,53 +266,17 @@ void Server::commandProcess(User & user, const std::string & message) {
 	args.erase(args.begin());
 	try {
 		for (int i = 0; i < 12; i++){
-			if (command == commandsName[i]){
+			if (command == this->commandsName[i]){
 			(this->*commandsPtr[i])(args, user);
 				break;
 			}
 		}
-		/*if (command == "PASS") {
-			this->passCommand(args, user);
-		}
-		else if (command == "USER") {
-			this->userCommand(args, user);
-		}
-		else if (command == "NICK") {
-			this->nickCommand(args, user);
-		}
-		else if (command == "PRIVMSG") {
-			this->privmsgCommand(args, user);
-		}
-		else if (command == "JOIN"){
-			this->joinCommand(args, user);
-		}
-		else if (command == "LIST"){
-			this->listCommand(args, user);
-		}
-		else if (command == "NOTICE"){
-			this->noticeCommand(args, user);
-		}
-		else if (command == "AWAY"){
-			this->awayCommand(args, user);
-		}
-		else if (command == "QUIT"){
-			this->quitCommand(args, user);
-		}
-		else if (command == "PART"){
-			this->partCommand(args, user);
-		}
-		else if (command == "TOPIC"){
-			this->topicCommand(args, user);
-		}
-		else if (command == "KICK"){
-            this->kickCommand(args, user);
-        }*/
 	} catch (std::string & error) {
 		user.sendMessage(error);
 	}
 }
 
-void Server::passCommand(std::vector<std::string> & args, User & user)/* const*/ {
+void Server::passCommand(std::vector<std::string> & args, User & user) {
 	if (user.getEnterPassword())
 		throw alreadyRegistered(user.getNickName());
 	if (args.empty())
@@ -323,7 +287,7 @@ void Server::passCommand(std::vector<std::string> & args, User & user)/* const*/
 	user.setEnterPassword(true);
 }
 
-void Server::userCommand(std::vector<std::string> & args, User & user)/* const*/ {
+void Server::userCommand(std::vector<std::string> & args, User & user) {
 	if (args.size() != 4) {
 		throw needMoreParams(user.getNickName(), "USER");
 	}
@@ -335,7 +299,7 @@ void Server::userCommand(std::vector<std::string> & args, User & user)/* const*/
 	user.sendMessage(welcomeMsg(user.getNickName()));
 }
 
-void Server::nickCommand(std::vector<std::string> & args, User & user)/* const*/ {
+void Server::nickCommand(std::vector<std::string> & args, User & user) {
 	std::string prevNick = user.getNickName();
 	if (args.empty()) {
 		throw needMoreParams(user.getNickName(), "NICK");
