@@ -440,15 +440,14 @@ void Server::joinCommand(std::vector<std::string> & args, User & user) {
 		Channel *channel = findChannelByName(channelsForJoin[i]);
 		if (channel == nullptr){
 			channel = createChannel(&user, channelsForJoin[i]);
-//            user.sendMessage("332 *" + channelsForJoin[i] + ": No topic is set\r\n"); todo topic
 		} else {
 			if (!channel->ifUserExist(user.getNickName()))
 			{
 				user.addChannel(channel);
 				channel->setUser(&user);
 			}
-//            channel->sendMessageToChannel( user.getNickName() + " joined the channel", &user);
 		}
+		user.sendMessage(rplTopic(user.getNickName(), channel->getChannelName(), channel->getTopic()));
 		user.sendMessage(this->constructMessage(user.getNickName(), "JOIN", channel->getChannelName()));
 		channel->sendMessageToChannel(this->constructMessage(user.getNickName(), "JOIN", channel->getChannelName()), &user);
 	}
@@ -467,11 +466,11 @@ void Server::kickCommand(std::vector<std::string> & args, User & user)
         Channel *channel = findChannelByName(channelsForKick[i]);
         if (channel == nullptr)
         {
-            user.sendMessage("403 *" + channelsForKick[i] + " :No such channel\r\n");
+            user.sendMessage("403 *" + channelsForKick[i] + " :No such channel");
         }
         else {
             if (!channel->getOperator()) {
-                user.sendMessage("482 *" + channelsForKick[i] + " :You're not channel operator\r\n");
+                user.sendMessage("482 *" + channelsForKick[i] + " :You're not channel operator");
             }
             std::vector<std::string> receivers = getReceivers(args[1]);
             for (int i = 0; i < receivers.size(); i++) {
@@ -506,22 +505,23 @@ void Server::namesCommand(std::vector<std::string> & args, User & user) {
 }
 
 /*
-выводит список каналов на сервере (и их топиков, но мы это опустим)
+выводит список каналов на сервере
 */
 void	Server::listCommand(std::vector<std::string> & args, User & user)
 {
 	if (!user.getRegistered()) {
         throw connectionRestricted(user.getNickName());
         }
-//    if (args.empty()) {
-//        throw needMoreParams(user.getNickName(), "LIST");
-//    }
-    std::vector<Channel *> channels_ =  this->getChannels();
-    for (std::vector<Channel *>::const_iterator i = channels_.begin(); i != channels_.end(); i++)
-    {
-        user.sendMessage((*i)->getChannelName());
+    if (args.empty()) {
+        throw needMoreParams(user.getNickName(), "LIST");
     }
-    user.sendMessage("323* :End of LIST\r\n"); // 323* :End of LIST ???
+	std::string channelsList;
+    for (int i = 0; i != channels.size(); i++)
+    {
+    	channelsList += channels[i]->getChannelName() + "\t\t:" + channels[i]->getTopic() + '\n';
+    }
+    user.sendMessage(channelsList);
+    user.sendMessage("323* :End of LIST"); // 323* :End of LIST ???
 }
 
 /*
