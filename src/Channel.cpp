@@ -22,7 +22,7 @@ void    Channel::setOperators(User *operatorr)
     this->userOperator = operatorr;
 }
 
-User*    Channel::getOperator(User *user)
+User*    Channel::isOperator(User *user)
 {
     if (userOperator == user)
         return this->userOperator;

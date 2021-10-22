@@ -33,7 +33,7 @@ public:
 	std::string         getTopic();
 
     void                setOperators(User *operatorr);
-    User*               getOperator(User *user);
+    User*               isOperator(User *user);
 };
 
 #endif

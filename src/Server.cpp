@@ -390,15 +390,15 @@ void	Server::noticeCommand(std::vector<std::string> & args, User & user) {
 		std::vector<std::string> receivers = getReceivers(args[0]);
 		for (int i = 0; i < receivers.size(); i++) {
 			User *recipientUser = this->findUserByName(receivers.at(i));
-			if (recipientUser != nullptr){
-				recipientUser->sendMessage(args[args.size() - 1]);
+			if (recipientUser != nullptr) {
+				recipientUser->sendMessage(constructMessage(user.getNickName(), "NOTICE", recipientUser->getNickName(), args[args.size() - 1]));
 			} else{
                 Channel *channel = this->findChannelByName(receivers.at(i));
                 if (channel == nullptr){
                     throw noSuchNick(user.getNickName(), receivers.at(i));
                 }
                 if (channel->ifUserExist(user.getNickName())) /*проверка на тор, чьо юзер вообще есть на канале*/
-                    channel->sendMessageToChannel(constructMessage(user.getNickName(), "PRIVMSG", channel->getChannelName(), args.at(args.size() -1)), &user);
+                    channel->sendMessageToChannel(constructMessage(user.getNickName(), "NOTICE", channel->getChannelName(), args.at(args.size() -1)), &user);
                 else
                     throw notOnChannel(receivers[i], user.getNickName());
 			}
@@ -442,22 +442,24 @@ void Server::kickCommand(std::vector<std::string> & args, User & user)
     std::vector<std::string> channelsForKick = getReceivers(args.at(0));
     for (int i = 0; i < channelsForKick.size(); i++) {
         Channel *channel = findChannelByName(channelsForKick[i]);
-        if (channel == nullptr)
-        {
-            throw "403 * " + channelsForKick[i] + " :No such channel";
+        if (channel == nullptr) {
+//            throw "403 * " + channelsForKick[i] + " :No such channel";
+			throw constructReply("403", "No such channel", user.getNickName(), channelsForKick[i]);
         }
         else {
-            if (!channel->getOperator(&user)) {
-                    throw "482 * " + channelsForKick[i] + " :You're not channel operator";
-            }
+            if (!channel->isOperator(&user)) {
+//				throw "482 * " + channelsForKick[i] + " :You're not channel operator";
+				throw constructReply("482", "You're not channel operator", user.getNickName(), channelsForKick[i]);
+			}
             std::vector<std::string> receivers = getReceivers(args[1]);
             for (int i = 0; i < receivers.size(); i++) {
                 User *recipientUser = this->findUserByName(receivers.at(i));
+				//todo: wtf is this
                 if (recipientUser == nullptr)
                     recipientUser->sendMessage(args[args.size() - 1]);
-                    else {
-                        channel->removeUser(recipientUser->getNickName());
-                    }
+				else {
+					channel->removeUser(recipientUser->getNickName());
+				}
             }
         }
     }
@@ -480,8 +482,8 @@ void	Server::listCommand(std::vector<std::string> & args, User & user)
     	channelsList += channels[i]->getChannelName() + "\t\t:" + channels[i]->getTopic() + '\n';
     }
     channelsList.erase(channelsList.length() -1);
-    user.sendMessage(channelsList);
-    user.sendMessage("323* :End of LIST");
+	user.sendMessage(constructReply("322", channelsList, user.getNickName()));
+	user.sendMessage(constructReply("323", "End of /LIST", user.getNickName()));
 }
 
 /*
@@ -573,11 +575,17 @@ std::vector<Channel *> Server::getChannels()
 {
 	return channels;
 }
-
+/**
+ * @param code - код ответа
+ * @param message - сообщение ответа
+ * @param nick - ник юзера (необязательный)
+ * @param secondParam - опциональный параметр команды (необязательный)
+ * @return
+ */
 std::string Server::constructReply(const std::string & code,
 								   const std::string & message,
-								   const std::string & nick = "*",
-								   const std::string & secondParam = "") const {
+								   const std::string & nick,
+								   const std::string & secondParam) const {
 	return code + " " + nick + " " + secondParam + " " + ":" + message + "\r\n";
 }
 

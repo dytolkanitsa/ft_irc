@@ -47,8 +47,8 @@ public:
 	// Replies
 	std::string constructReply(const std::string & code,
 							   const std::string & message,
-							   const std::string & nick,
-							   const std::string & secondParam) const;
+							   const std::string & nick = "*",
+							   const std::string & secondParam = "") const;
 	std::string constructMessage(const std::string & sender,
 								 const std::string & command,
 								 const std::string & recipient,

@@ -43,7 +43,6 @@ std::string User::getPassword() {
 }
 
 void User::sendMessage(std::string msg)/* const*/ {
-	msg += "\r\n";
 	send(this->socketFd, msg.c_str(), msg.length(), 0);
 }
 
