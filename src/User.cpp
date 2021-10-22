@@ -10,31 +10,31 @@ User::User(int socketFd) : socketFd(socketFd), registered(false), enterPassword(
 User::~User() {
 }
 
-std::string	User::getNickName() /*const*/ {
+std::string User::getNickName() /*const*/ {
 	return nickName;
 }
 
-int	User::getSocketFd() /*const*/ {
+int User::getSocketFd() /*const*/ {
 	return socketFd;
 }
 
-std::string 	User::getRealName() {
+std::string User::getRealName() {
 	return realName;
 }
 
-void	User::setNickName(const std::string & nickName) {
+void User::setNickName(const std::string &nickName) {
 	this->nickName = nickName;
 }
 
-void	User::setSocketFd(int socket) {
+void User::setSocketFd(int socket) {
 	this->socketFd = socket;
 }
 
-void	User::setRealName(const std::string & realName) {
+void User::setRealName(const std::string &realName) {
 	this->realName = realName;
 }
 
-void User::setPassword(const std::string & pass) {
+void User::setPassword(const std::string &pass) {
 	this->password = pass;
 }
 
@@ -50,16 +50,16 @@ void User::addChannel(Channel *channel) {
 	this->channels.push_back(channel);
 }
 
-void	User::setAwayMessage(std::string	message) {
+void User::setAwayMessage(std::string message) {
 	awayMessage = message;
 }
 
-std::string	User::getAwayMessage() {
+std::string User::getAwayMessage() {
 	return awayMessage;
 }
 
 void User::leaveAllChannels() {
-	for (int i = 0; i < this->channels.size(); i++){
+	for (int i = 0; i < this->channels.size(); i++) {
 		channels[i]->removeUser(this->nickName);
 		channels.erase(channels.begin() + i);
 	}

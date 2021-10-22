@@ -2,14 +2,14 @@
 #include "User.hpp"
 
 
-Channel::Channel(std::string chName) : channelName(chName){
+Channel::Channel(std::string chName) : channelName(chName) {
 
 }
 
 Channel::~Channel() {
 }
 
-std::string	Channel::getChannelName(void) {
+std::string Channel::getChannelName(void) {
 	return channelName;
 }
 
@@ -17,17 +17,15 @@ std::vector<User *> Channel::getUsers(void) {
 	return users;
 }
 
-void    Channel::setOperators(User *operatorr)
-{
-    this->userOperator = operatorr;
+void Channel::setOperators(User *operatorr) {
+	this->userOperator = operatorr;
 }
 
-User*    Channel::isOperator(User *user)
-{
-    if (userOperator == user)
-        return this->userOperator;
-    else
-        return nullptr;
+User *Channel::isOperator(User *user) {
+	if (userOperator == user)
+		return this->userOperator;
+	else
+		return nullptr;
 }
 
 //User*	Channel::getUser(std::string	userName) {
@@ -50,21 +48,20 @@ bool	Channel::ifUserExist(std::string userName) {
 }
 */
 
-void	Channel::setUser(User* user) {
+void Channel::setUser(User *user) {
 	users.push_back(user);
 }
 
 void Channel::sendMessageToChannel(std::string msg, User *sender) {
 	std::vector<User *>::const_iterator i;
-	for (i = users.begin(); i != users.end(); i++)
-	{
+	for (i = users.begin(); i != users.end(); i++) {
 		if (*i != sender)
 			(*i)->sendMessage(msg);
 	}
 }
 
 bool Channel::ifUserExist(std::string userName) {
-	for(int i = 0; i < this->users.size(); i++) {
+	for (int i = 0; i < this->users.size(); i++) {
 		if (users[i]->getNickName() == userName) {
 			return true;
 		}
@@ -72,20 +69,19 @@ bool Channel::ifUserExist(std::string userName) {
 	return false;
 }
 
-void	 Channel::removeUser(std::string userName) {
-	 int found = 0;
-	for (std::vector<User *>::const_iterator i = users.begin(); i != users.end(); i++)
-	{
+void Channel::removeUser(std::string userName) {
+	int found = 0;
+	for (std::vector<User *>::const_iterator i = users.begin(); i != users.end(); i++) {
 		if ((*i)->getNickName() == userName)
 			break;
-		 found++;
+		found++;
 	}
 	// erase удаляет из вектора диапазон элементов начиная с found знакачивая длиной строки
 	this->users.erase(users.begin() + found);
 }
 
 bool Channel::isEmpty() {
-	if(users.empty()){
+	if (users.empty()) {
 		return true;
 	}
 	return false;
