@@ -436,30 +436,26 @@ void Server::kickCommand(std::vector<std::string> & args, User & user)
     if (!user.getRegistered()) {
         throw connectionRestricted(user.getNickName());
     }
-    if (args.size() != 2) {
+    if (args.size() < 2) {
         throw needMoreParams(user.getNickName(), "KICK");
     }
-    std::vector<std::string> channelsForKick = getReceivers(args.at(0));
-    for (int i = 0; i < channelsForKick.size(); i++) {
-        Channel *channel = findChannelByName(channelsForKick[i]);
-        if (channel == nullptr)
-        {
-            throw "403 * " + channelsForKick[i] + " :No such channel";
-        }
-        else {
-            if (!channel->getOperator(&user)) {
-                    throw "482 * " + channelsForKick[i] + " :You're not channel operator";
-            }
-            std::vector<std::string> receivers = getReceivers(args[1]);
-            for (int i = 0; i < receivers.size(); i++) {
-                User *recipientUser = this->findUserByName(receivers.at(i));
-                if (recipientUser == nullptr)
-                    recipientUser->sendMessage(args[args.size() - 1]);
-                    else {
-                        channel->removeUser(recipientUser->getNickName());
-                    }
-            }
-        }
+	Channel *channel = findChannelByName(args[0]);
+	if (channel == nullptr)
+	{
+		throw "403 * " + args[0] + " :No such channel";
+	}
+	else {
+		if (!channel->getOperator(&user)) {
+				throw "482 * " + args[0] + " :You're not channel operator";
+		}
+			User *recipientUser = this->findUserByName(args[1]);
+			if (recipientUser != nullptr) {
+				recipientUser->sendMessage(constructMessage(user.getNickName(), "KICK", recipientUser->getNickName(), args.size() == 2 ? "" : args[2]));
+				channel->removeUser(recipientUser->getNickName());
+			}
+			else {
+				throw noSuchNick(args[1], user.getNickName());
+			}
     }
 }
 
