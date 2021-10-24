@@ -216,8 +216,8 @@ void Server::privmsgCommand(std::vector<std::string> &args, User &user) {
 				}
 				if (channel->ifUserExist(user.getNickName())) /*проверка на тор, чьо юзер вообще есть на канале*/
 					channel->sendMessageToChannel(constructMessage(user.getNickName(), "PRIVMSG", channel->getChannelName(), args.at(args.size() - 1)), &user);
-					else
-						throw notOnChannel(receivers[i], user.getNickName());
+				else
+					throw notOnChannel(receivers[i], user.getNickName());
 			}
 		}
 	}
