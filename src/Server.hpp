@@ -48,7 +48,7 @@ public:
 
 	User *findUserByFd(int fd);
 
-	Channel *findChannelByName(std::string channelName);
+	Channel *findChannelByName(const std::string& channelName);
 
 	void commandProcess(User &user, const std::string &message);
 

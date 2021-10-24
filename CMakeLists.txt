@@ -10,7 +10,7 @@ add_executable(ft_irc
         src/Server.cpp
         src/User.cpp
         src/Channel.cpp
-        )
+        src/Command.cpp src/Message.cpp src/OtherServerMethods.cpp)
 
 add_executable(showip
         showip.cpp)
