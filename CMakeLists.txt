@@ -12,8 +12,8 @@ add_executable(ft_irc
         src/Channel.cpp
         src/Command.cpp src/Message.cpp src/OtherServerMethods.cpp)
 
-add_executable(showip
-        showip.cpp)
+add_executable(Bot
+        src/Bot.cpp src/Bot.hpp mainBot.cpp)
 
 add_executable(test
         test.cpp)

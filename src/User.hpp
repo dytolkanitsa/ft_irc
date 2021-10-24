@@ -14,9 +14,10 @@ class Channel;
 
 
 class User {
-private:
+protected:
 	int socketFd;
 	std::string nickName;
+private:
 	std::string realName;
 	std::string password;
 	std::string awayMessage;
