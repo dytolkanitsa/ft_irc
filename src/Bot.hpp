@@ -14,10 +14,13 @@ class Bot : public User{
 private:
 	std::string host;
 	std::string port;
+	std::string pass;
 public:
-	Bot(int socketFd, std::string host, std::string port);
+	Bot(int socketFd, std::string host, std::string port, std::string pass);
 //	~Bot();
 	void startBot();
+	void doRegister();
+	void commandProcess(std::string arg);
 };
 
 

@@ -9,7 +9,7 @@
 #include "Bot.hpp"
 //#include "User.hpp"
 
-Bot::Bot(int socketFd, std::string host, std::string port) : User(socketFd), host(host), port(port) {
+Bot::Bot(int socketFd, std::string host, std::string port, std::string pass) : User(socketFd), host(host), port(port), pass(pass) {
 }
 
 // get sockaddr, IPv4 or IPv6:
@@ -64,19 +64,79 @@ void Bot::startBot() {
 	printf("client: connecting to %s\n", s);
 
 	freeaddrinfo(servinfo); // all done with this structure
-	/*this->setSocketFd(sockfd);*/
-//	while (true){
-//
-//	}
-	if ((numbytes = recv(sockfd, buf, 512 - 1, 0)) == -1) {
-		perror("recv");
-		exit(1);
+	this->setSocketFd(sockfd);
+	this->doRegister();
+	while(true) {
+		if ((numbytes = recv(sockfd, buf, 512 - 1, 0)) == -1) {
+			perror("recv");
+			exit(1);
+		} else {
+			buf[numbytes] = '\0';
+			printf("client: received %s\n",buf);
+			this->commandProcess(buf);
+		}
+
+
 	}
 
-	buf[numbytes] = '\0';
-
-	printf("client: received '%s'\n",buf);
 
 	close(sockfd);
 
+}
+
+void Bot::doRegister() {
+//	this->pass = "PASS " + this->pass + "\r\n";
+	std::string passMessage = "PASS " + this->pass + "\r\n";
+	send(this->socketFd, passMessage.c_str(), 8, 0); /*todo: hardcode pass*/
+	sleep(1);
+	send(this->socketFd, "NICK DaBot\r\n", 12, 0);
+	sleep(1);
+	send(this->socketFd,"USER 1 1 1 1\r\n", 14,0);
+}
+
+std::string getMessage(std::string arg){
+	std::string message;
+	int pos = arg.find("\r\n");
+	if (pos != std::string::npos) {
+		arg = arg.substr(0, pos);
+	}
+	pos = arg.find(':',1);
+	message = arg.substr(pos + 1);
+	unsigned long spaceSkip = message.length() - 1;
+	while (message[spaceSkip] == ' ' && spaceSkip != 0) {
+		spaceSkip--;
+	}
+	if (spaceSkip != 0) {
+		message = message.substr(0, spaceSkip + 1);
+	}
+	pos = message.find(':', 0);
+	if (pos != std::string::npos) {
+		message = message.substr(pos + 1);
+		message.erase(pos);
+	}
+	return message;
+}
+
+std::string getNick(std::string arg){
+	int pos = arg.find(' ');
+	std::string nick = arg.substr(1, pos - 1);
+	return nick;
+}
+
+void Bot::commandProcess(std::string arg) {
+	std::string message = getMessage(arg);
+	std::string messageToUser;
+	if (message == "da" || message == "Da" || message == "Да" || message == "да"){
+		messageToUser = "PRIVMSG " + getNick(arg) + " :П**да\r\n";
+		send(this->socketFd, messageToUser.c_str(), messageToUser.length(), 0);
+	} else if (message == "нет" || message == "Нет" || message == "Net" || message == "net"){
+		messageToUser = "PRIVMSG " + getNick(arg) + " :П*д*ра ответ\r\n";
+		send(this->socketFd, messageToUser.c_str(), messageToUser.length(), 0);
+	}else if (message == "a" || message == "A" || message == "а" || message == "А"){
+		messageToUser = "PRIVMSG " + getNick(arg) + " :Х*й на\r\n";
+		send(this->socketFd, messageToUser.c_str(), messageToUser.length(), 0);
+	}else if (message == "Ало" || message == "ало" || message == "alo" || message == "Alo"){
+		messageToUser = "PRIVMSG " + getNick(arg) + " :х**м по лбу не дало?\r\n";
+		send(this->socketFd, messageToUser.c_str(), messageToUser.length(), 0);
+	}
 }
