@@ -41,7 +41,7 @@ public:
 
 	void setNickName(const std::string &nickName);
 
-	void setRealName(const std::string &realName);;
+	void setRealName(const std::string &realName);
 
 	void setEnterPassword(bool param) { enterPassword = param; }
 	void setRegistered(bool param) { registered = param; }
