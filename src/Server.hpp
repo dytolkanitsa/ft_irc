@@ -9,8 +9,6 @@
 #include <iostream>
 #include <sys/poll.h>
 #include <vector>
-//#include "User.hpp"
-//#include "Channel.hpp"
 
 class User;
 
@@ -83,8 +81,6 @@ public:
 
 	std::string welcomeMsg(const std::string &nick) const;
 
-	std::string NoRecipientGiven(const std::string &nick) const;
-
 	std::string awayMessageHaveBeenUnset(const std::string &nick) const;
 
 	std::string notOnChannel(const std::string &nick, const std::string &channel) const;
@@ -92,11 +88,11 @@ public:
 	std::string rplTopic(const std::string &nick, const std::string &channel, const std::string &topic) const;
 
 	// Commands
-	void passCommand(std::vector<std::string> &args, User &user)/* const*/;
+	void passCommand(std::vector<std::string> &args, User &user);
 
-	void userCommand(std::vector<std::string> &args, User &user)/* const*/;
+	void userCommand(std::vector<std::string> &args, User &user);
 
-	void nickCommand(std::vector<std::string> &args, User &user)/* const*/;
+	void nickCommand(std::vector<std::string> &args, User &user);
 
 	void privmsgCommand(std::vector<std::string> &args, User &user);
 
@@ -117,8 +113,6 @@ public:
 	void kickCommand(std::vector<std::string> &args, User &user);
 
 	Channel *createChannel(User *user, std::string name);
-
-	std::vector<Channel *> getChannels();
 
 	void removeUser(User *user);
 

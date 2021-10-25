@@ -10,39 +10,23 @@ User::User(int socketFd) : socketFd(socketFd), registered(false), enterPassword(
 User::~User() {
 }
 
-std::string User::getNickName() /*const*/ {
+std::string User::getNickName() {
 	return nickName;
 }
 
-int User::getSocketFd() /*const*/ {
+int User::getSocketFd() {
 	return socketFd;
-}
-
-std::string User::getRealName() {
-	return realName;
 }
 
 void User::setNickName(const std::string &nickName) {
 	this->nickName = nickName;
 }
 
-void User::setSocketFd(int socket) {
-	this->socketFd = socket;
-}
-
 void User::setRealName(const std::string &realName) {
 	this->realName = realName;
 }
 
-void User::setPassword(const std::string &pass) {
-	this->password = pass;
-}
-
-std::string User::getPassword() {
-	return this->password;
-}
-
-void User::sendMessage(std::string msg)/* const*/ {
+void User::sendMessage(std::string msg) {
 	send(this->socketFd, msg.c_str(), msg.length(), 0);
 }
 
