@@ -13,7 +13,7 @@ add_executable(ft_irc
         src/Command.cpp src/Message.cpp src/OtherServerMethods.cpp)
 
 add_executable(Bot
-        src/Bot.cpp src/Bot.hpp mainBot.cpp)
+        src/Bot.cpp src/Bot.hpp mainBot.cpp src/User.cpp src/Channel.cpp)
 
 add_executable(test
         test.cpp)
