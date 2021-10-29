@@ -53,7 +53,7 @@ void Server::init() {
 	if (rp == nullptr) {
 		throw std::runtime_error("bind error");
 	}
-	freeaddrinfo(serverInfo); // освобождаем связанный список
+	freeaddrinfo(serverInfo); /// освобождаем связанный список
 	this->socketFd = newSocketFd;
 }
 
@@ -124,7 +124,7 @@ void Server::acceptProcess() {
 		if ((nowPollfd.revents & POLLHUP) == POLLHUP) { ///кто-то оборвал соединение
 			User *user = findUserByFd(nowPollfd.fd);
 			if (user == nullptr) {
-				continue; // я вот вообще честно говоря вообще не знаю, когда такое может произойти
+				continue;
 			}
 			this->removeUser(user);
 			close(fds[i].fd);

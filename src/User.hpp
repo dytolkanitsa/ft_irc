@@ -8,7 +8,6 @@
 #include <iostream>
 #include <vector>
 #include <sys/socket.h>
-//#include "Channel.hpp"
 
 class Channel;
 
@@ -19,7 +18,6 @@ protected:
 	std::string nickName;
 private:
 	std::string realName;
-	std::string password;
 	std::string awayMessage;
 	bool enterPassword;
 	bool enterNick;
@@ -31,35 +29,23 @@ public:
 
 	virtual         ~User();
 
-	void sendMessage(std::string msg)/* const*/;
+	void sendMessage(std::string msg);
 
-	std::string getNickName() /*const*/;
+	std::string getNickName();
 
-	int getSocketFd() /*const*/;
+	int getSocketFd();
 
-	std::string getRealName();
-
-	std::string getPassword();
-
-	bool getEnterPassword() const { return enterPassword; } // 7
+	bool getEnterPassword() const { return enterPassword; }
 	bool getEnterNick() const { return enterNick; }
 
-	bool getRegistered() const { return registered; } // 8
+	bool getRegistered() const { return registered; }
 
 	void setNickName(const std::string &nickName);
 
-	void setSocketFd(int socket);
+	void setRealName(const std::string &realName);
 
-	void setRealName(const std::string &realName);;
-
-	void setPassword(const std::string &pass);
-
-	void makeOperator();
-
-	void removeOperator();
-
-	void setEnterPassword(bool param) { enterPassword = param; } // 7
-	void setRegistered(bool param) { registered = param; } // 8
+	void setEnterPassword(bool param) { enterPassword = param; }
+	void setRegistered(bool param) { registered = param; }
 	void setEnterNick(bool param) { enterNick = param; }
 
 	void addChannel(Channel *channel);

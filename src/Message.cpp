@@ -73,10 +73,6 @@ std::string Server::awayMessageHaveBeenUnset(const std::string &nick) const {
 	return constructReply("306", "You are no longer marked as being away", nick);
 }
 
-std::string Server::NoRecipientGiven(const std::string &nick) const {
-	return constructReply("411", ":No recipient given ", nick);
-}
-
 std::string Server::rplTopic(const std::string &nick, const std::string &channel, const std::string &topic) const {
 	if (!topic.empty())
 		return constructReply("332", topic, nick, channel);
