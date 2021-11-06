@@ -1,5 +1,5 @@
-NAME	=	ft_irc
-BONUS = 	ft_bot
+NAME	=	ircserv
+BONUS = 	ircbot
 
 SRCS	:=	main.cpp\
 			src/Server.cpp\
