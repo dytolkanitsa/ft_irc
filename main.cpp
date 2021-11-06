@@ -3,7 +3,7 @@
 //
 #include <cstring>
 
-#include "Server.hpp"
+#include "src/Server.hpp"
 
 /**
  *separate the numbers of the first argument delimited ':'
@@ -17,7 +17,7 @@ std::string * getArgs(const std::string& av){
 
 	for (int i = 0; i < 3; i++){
 		newPos = av.find(':', pos);
-		if (newPos == std::string::npos && i != 2 || (i == 2 && newPos != std::string::npos))
+		if ((newPos == std::string::npos && i != 2) || (i == 2 && newPos != std::string::npos))
 			return nullptr;
 		result[i] = av.substr(pos, newPos - pos);
 		pos = newPos + 1;
@@ -35,11 +35,9 @@ int main(int ac, char ** av){
 			std::cout << "./ircserv [host:port_network:password_network] <port> <password>\n";
 			return 1;
 		}
-//		std::string * port
-		Server server(&res[0], av[2], av[3]); // todo: какие аргументы мы передаем?
+		Server server(&res[0], av[2], av[3]);
 		server.init();
 		server.start();
-		// так как выделена память на первый аргумент и массив в принципе, надо не забыть ее освободить
 	} else
 	{
 		std::cout << "./ircserv [host:port_network:password_network] <port> <password>\n";

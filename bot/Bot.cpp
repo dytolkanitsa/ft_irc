@@ -85,9 +85,8 @@ void Bot::startBot() {
 }
 
 void Bot::doRegister() {
-//	this->pass = "PASS " + this->pass + "\r\n";
 	std::string passMessage = "PASS " + this->pass + "\r\n";
-	send(this->socketFd, passMessage.c_str(), 8, 0); /*todo: hardcode pass*/
+	send(this->socketFd, passMessage.c_str(), 8, 0);
 	sleep(1);
 	send(this->socketFd, "NICK DaBot\r\n", 12, 0);
 	sleep(1);

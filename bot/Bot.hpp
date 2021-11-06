@@ -17,7 +17,7 @@ private:
 	std::string pass;
 public:
 	Bot(int socketFd, std::string host, std::string port, std::string pass);
-//	~Bot();
+//	~bot();
 	void startBot();
 	void doRegister();
 	void commandProcess(std::string arg);
