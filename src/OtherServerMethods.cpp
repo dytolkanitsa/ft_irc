@@ -29,7 +29,7 @@ std::string Server::recvMessage(int fd) {
  * @return указатель на пользователя с необходимым именем или nullptr
  */
 User *Server::findUserByName(const std::string &userName) const {
-	for (int i = 0; i < this->users.size(); i++) {
+	for (unsigned int i = 0; i < this->users.size(); i++) {
 		if (users[i]->getNickName() == userName) {
 			return users[i];
 		}
@@ -96,7 +96,7 @@ std::vector<std::string> Server::setArgs(std::string argString) {
  * @return указатель на канал или nullptr при неудаче
  */
 Channel *Server::findChannelByName(const std::string& channelName) {
-	for (int i = 0; i < this->channels.size(); i++) {
+	for (unsigned int i = 0; i < this->channels.size(); i++) {
 		if (channelName == this->channels[i]->getChannelName()) {
 			return this->channels[i];
 		}
@@ -110,7 +110,7 @@ Channel *Server::findChannelByName(const std::string& channelName) {
  * @return возвращает указатель на пользователя или nullptr, если не нашел
  */
 User *Server::findUserByFd(int fd) {
-	for (int i = 0; i < this->users.size(); i++) {
+	for (unsigned int i = 0; i < this->users.size(); i++) {
 		if (fd == this->users[i]->getSocketFd()) {
 			return this->users[i];
 		}
@@ -138,7 +138,7 @@ Channel *Server::createChannel(User *user, std::string name) {
  * @param user указатель на юзера
  */
 void Server::removeUser(User *user) {
-	for (int i = 0; i != this->users.size(); i++) {
+	for (unsigned int i = 0; i != this->users.size(); i++) {
 		if (user == users[i]) {
 			users[i]->leaveAllChannels();
 			users.erase(users.begin() + i);
@@ -152,7 +152,7 @@ void Server::removeUser(User *user) {
  * @param fd фд
  */
 void Server::removePollfd(int fd) {
-	for (int i = 0; i < fds.size(); i++) {
+	for (unsigned int i = 0; i < fds.size(); i++) {
 		if (fd == fds[i].fd) {
 			this->fds.erase(fds.begin() + i);
 			break;
@@ -165,7 +165,7 @@ void Server::removePollfd(int fd) {
  * @param channelName имя канала
  */
 void Server::removeChannel(std::string channelName) {
-	for (int i = 0; i < this->channels.size(); i++) {
+	for (unsigned int i = 0; i < this->channels.size(); i++) {
 		if (channelName == this->channels[i]->getChannelName()) {
 			this->channels.erase(channels.begin() + i);
 			break;

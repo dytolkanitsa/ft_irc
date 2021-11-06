@@ -64,7 +64,6 @@ void Bot::startBot() {
 	printf("client: connecting to %s\n", s);
 
 	freeaddrinfo(servinfo); // all done with this structure
-	this->setSocketFd(sockfd);
 	this->doRegister();
 	while(true) {
 		if ((numbytes = recv(sockfd, buf, 512 - 1, 0)) == -1) {
@@ -95,7 +94,7 @@ void Bot::doRegister() {
 
 std::string getMessage(std::string arg){
 	std::string message;
-	int pos = arg.find("\r\n");
+	unsigned long pos = arg.find("\r\n");
 	if (pos != std::string::npos) {
 		arg = arg.substr(0, pos);
 	}

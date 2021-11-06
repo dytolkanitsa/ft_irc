@@ -37,6 +37,7 @@ std::vector<std::string> getReceivers(std::string receivers) {
 }
 
 void Server::quitCommand(std::vector<std::string> &args, User &user) {
+	(void) args;
 	this->removeUser(&user);
 	close(user.getSocketFd());
 	this->removePollfd(user.getSocketFd());
@@ -70,7 +71,7 @@ void Server::partCommand(std::vector<std::string> &args, User &user) {
 		throw needMoreParams(user.getNickName(), "PART");
 	}
 	std::vector<std::string> receivers = getReceivers(args[0]);
-	for (int i = 0; i < receivers.size(); i++) {
+	for (unsigned int i = 0; i < receivers.size(); i++) {
 		Channel *channel = findChannelByName(receivers[i]);
 		if (channel == nullptr) {
 			throw noSuchNick(user.getNickName(), receivers[i]);
@@ -104,11 +105,12 @@ void Server::awayCommand(std::vector<std::string> &args, User &user) {
 }
 
 void Server::listCommand(std::vector<std::string> &args, User &user) {
+	(void) args;
 	if (!user.getRegistered()) {
 		throw connectionRestricted(user.getNickName());
 	}
 	std::string channelsList;
-	for (int i = 0; i != channels.size(); i++) {
+	for (unsigned int i = 0; i != channels.size(); i++) {
 		channelsList += channels[i]->getChannelName() + "\t\t:" + channels[i]->getTopic() + '\n';
 	}
 	channelsList.erase(channelsList.length() - 1);
@@ -152,7 +154,7 @@ void Server::joinCommand(std::vector<std::string> &args, User &user) {
 		throw needMoreParams(user.getNickName(), "JOIN");
 	}
 	std::vector<std::string> channelsForJoin = getReceivers(args.at(0));
-	for (int i = 0; i < channelsForJoin.size(); i++) {
+	for (unsigned int i = 0; i < channelsForJoin.size(); i++) {
 		Channel *channel = findChannelByName(channelsForJoin[i]);
 		if (channel == nullptr) {
 			channel = createChannel(&user, channelsForJoin[i]);
@@ -176,7 +178,7 @@ void Server::noticeCommand(std::vector<std::string> &args, User &user) {
 		throw needMoreParams(user.getNickName(), "NOTICE");
 	} else {
 		std::vector<std::string> receivers = getReceivers(args[0]);
-		for (int i = 0; i < receivers.size(); i++) {
+		for (unsigned int i = 0; i < receivers.size(); i++) {
 			User *recipientUser = this->findUserByName(receivers.at(i));
 			if (recipientUser != nullptr) {
 				recipientUser->sendMessage(constructMessage(user.getNickName(), "NOTICE", recipientUser->getNickName(), args[args.size() - 1]));
@@ -202,7 +204,7 @@ void Server::privmsgCommand(std::vector<std::string> &args, User &user) {
 		throw needMoreParams(user.getNickName(), "PRIVMSG");
 	} else {
 		std::vector<std::string> receivers = getReceivers(args[0]);
-		for (int i = 0; i < receivers.size(); i++) {
+		for (unsigned int i = 0; i < receivers.size(); i++) {
 			User *recipientUser = this->findUserByName(receivers.at(i));
 			if (recipientUser != nullptr) {
 				recipientUser->sendMessage(constructMessage(user.getNickName(), "PRIVMSG", recipientUser->getNickName(), args[args.size() - 1]));

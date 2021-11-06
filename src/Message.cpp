@@ -38,7 +38,7 @@ std::string Server::alreadyRegistered(const std::string &nick) const {
 }
 
 std::string Server::needMoreParams(const std::string &nick, const std::string &command) const {
-	return constructReply("461", "Not enough parameters", nick);
+	return constructReply("461", "Not enough parameters", nick, command);
 }
 
 std::string Server::passMismatch(const std::string &nick) const {

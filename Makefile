@@ -1,5 +1,5 @@
 NAME	=	ft_irc
-BONUS = 	ft_irc_bonus
+BONUS = 	ft_bot
 
 SRCS	:=	main.cpp\
 			src/Server.cpp\
@@ -14,38 +14,43 @@ HEAD	:=	src/Server.hpp\
 			src/Channel.hpp\
 
 BONUS_SRCS = bot/Bot.cpp\
-             bot/Bot.hpp\
              bot/mainBot.cpp\
+             bot/User.cpp\
+             bot/Channel.cpp
 
-COMP		= clang++ -Wall -Wextra -Werror
+BONUS_HEADER = bot/Bot.hpp\
+             bot/User.hpp\
+             bot/Channel.hpp
+
+COMP		= clang++ -Wall -Wextra -Werror -std=c++11
 
 OBJS	=	$(SRCS:.cpp=.o)
 
 BONUS_OBJS = $(BONUS_SRCS:.cpp=.o)
-
-bonus: $(BONUS)
 
 all:		$(NAME)
 
 $(NAME):	$(OBJS)
 			$(COMP) $(OBJS) -o $(NAME)
 
-$(BONUS): $(BONUS_OBJS)
-	@$(COMP)  -o $(BONUS) $(BONUS_OBJS)
-#	@#$(G++)  bot.cpp -o client
+bonus:		bot $(NAME)
 
+bot:		$(BONUS_OBJS)
+			$(COMP) $(BONUS_OBJS) -o $(BONUS)
+
+clean:
+			rm -rf $(OBJS) $(BONUS_OBJS)
 
 .cpp.o:
 			$(COMP) -c $< -o $(<:.cpp=.o)
 
-clean:
-			rm -rf $(OBJS)
-
 $(OBJS):	$(HEAD)
 
+$(BONUS_OBJS):	$(BONUS_HEADER)
+
 fclean:		clean
-			rm -rf $(NAME)
+			rm -rf $(NAME) $(BONUS)
 
 re:			fclean all
 
-.PHONY:		all clean fclean re
+.PHONY:		all clean fclean re bonus

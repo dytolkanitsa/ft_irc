@@ -13,7 +13,7 @@
 #include "Channel.hpp"
 
 Server::Server(const std::string *host, const std::string &port, const std::string &password)
-		: host(nullptr), port(port), password(password), socketFd(-1) {
+: socketFd(-1), host(host), port(port), password(password) {
 	commands = {&Server::passCommand, &Server::userCommand, &Server::nickCommand, &Server::privmsgCommand,
 				&Server::joinCommand, &Server::listCommand, &Server::noticeCommand, &Server::awayCommand,
 				&Server::quitCommand, &Server::partCommand, &Server::topicCommand, &Server::kickCommand};
@@ -88,7 +88,7 @@ Server::~Server() {
 void Server::acceptProcess() {
 	pollfd nowPollfd;
 
-	for (int i = 0; i < this->fds.size(); i++) {
+	for (unsigned int i = 0; i < this->fds.size(); i++) {
 		nowPollfd = this->fds[i];
 
 		if ((nowPollfd.revents & POLLIN) == POLLIN) { ///модно считать данные
