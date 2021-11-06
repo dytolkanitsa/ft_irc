@@ -29,6 +29,8 @@ int main(int ac, char ** av){
 	if (ac == 3){
 		av[2][strlen(av[2] -1)] = '\0';
 		Server server(nullptr, av[1], av[2]);
+		server.init();
+		server.start();
 	} else if (ac == 4){
 		std::string *res = getArgs(av[1]);
 		if (res == nullptr){
