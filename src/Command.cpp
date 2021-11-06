@@ -111,10 +111,8 @@ void Server::listCommand(std::vector<std::string> &args, User &user) {
 	}
 	std::string channelsList;
 	for (unsigned int i = 0; i != channels.size(); i++) {
-		channelsList += channels[i]->getChannelName() + "\t\t:" + channels[i]->getTopic() + '\n';
+		user.sendMessage(constructReply("322", std::to_string(channels[i]->userCount()), user.getNickName(), channels[i]->getChannelName()));//, std::to_string(channels[i]->userCount())));
 	}
-	channelsList.erase(channelsList.length() - 1);
-	user.sendMessage(constructReply("322", channelsList, user.getNickName()));
 	user.sendMessage(constructReply("323", "End of /LIST", user.getNickName()));
 }
 

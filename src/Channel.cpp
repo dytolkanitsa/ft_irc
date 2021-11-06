@@ -74,3 +74,7 @@ std::string Channel::setGetTopic(std::string newTopic) {
 	this->setTopic(newTopic);
 	return this->getTopic();
 }
+
+unsigned long Channel::userCount() {
+	return this->users.size();
+}

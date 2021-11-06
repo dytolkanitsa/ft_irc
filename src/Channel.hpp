@@ -39,6 +39,8 @@ public:
 	void setOperators(User *operatorr);
 
 	User *isOperator(User *user);
+
+	unsigned long userCount();
 };
 
 #endif
