@@ -64,6 +64,7 @@ void Bot::startBot() {
 	printf("client: connecting to %s\n", s);
 
 	freeaddrinfo(servinfo); // all done with this structure
+	this->socketFd = sockfd;
 	this->doRegister();
 	while(true) {
 		if ((numbytes = recv(sockfd, buf, 512 - 1, 0)) == -1) {
