@@ -15,6 +15,7 @@ std::string * getArgs(const std::string& av){
 	size_t pos = 0;
 	size_t newPos;
 
+
 	for (int i = 0; i < 3; i++){
 		newPos = av.find(':', pos);
 		if ((newPos == std::string::npos && i != 2) || (i == 2 && newPos != std::string::npos))
@@ -26,7 +27,13 @@ std::string * getArgs(const std::string& av){
 }
 
 int main(int ac, char ** av){
+	unsigned long pos;
+	std::string pass = av[2];
 	if (ac == 3){
+		pos = pass.find('\n');
+		if (pos != std::string::npos){
+			pass[pos] = '\0';
+		}
 		av[2][strlen(av[2] -1)] = '\0';
 		Server server(nullptr, av[1], av[2]);
 		server.init();

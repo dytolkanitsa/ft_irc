@@ -127,19 +127,22 @@ void Server::kickCommand(std::vector<std::string> & args, User & user)
 	Channel *channel = findChannelByName(args[0]);
 	if (channel == nullptr)
 	{
-		throw "403 * " + args[0] + " :No such channel";
+		throw constructReply("403", "No such channel", user.getNickName(), args[0]);
 	}
 	else {
 		if (!channel->isOperator(&user)) {
-			throw "482 * " + args[0] + " :You're not channel operator";
-		}
-		User *recipientUser = this->findUserByName(args[1]);
-		if (recipientUser != nullptr) {
-			recipientUser->sendMessage(constructMessage(user.getNickName(), "KICK", recipientUser->getNickName(), args.size() == 2 ? "" : args[2]));
-			channel->removeUser(recipientUser->getNickName());
-		}
-		else {
-			throw noSuchNick(args[1], user.getNickName());
+			throw constructReply("482", "You're not channel operator", user.getNickName(), args[0]);
+		} else{
+			User *recipientUser = this->findUserByName(args[1]);
+			if (recipientUser != nullptr) {
+				recipientUser->sendMessage(
+						constructMessage(user.getNickName(), "KICK",
+										 recipientUser->getNickName(),
+										 args.size() == 2 ? "" : args[2]));
+				channel->removeUser(recipientUser->getNickName());
+			} else {
+				throw noSuchNick(args[1], user.getNickName());
+			}
 		}
 	}
 }
