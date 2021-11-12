@@ -125,17 +125,17 @@ std::string getNick(std::string arg){
 void Bot::commandProcess(std::string arg) {
 	std::string message = getMessage(arg);
 	std::string messageToUser;
-	if (message == "da" || message == "Da" || message == "Да" || message == "да"){
-		messageToUser = "PRIVMSG " + getNick(arg) + " :П**да\r\n";
+	if (message == "Are you a bot?"){
+		messageToUser = "PRIVMSG " + getNick(arg) + " :Yes\r\n";
 		send(this->socketFd, messageToUser.c_str(), messageToUser.length(), 0);
-	} else if (message == "нет" || message == "Нет" || message == "Net" || message == "net"){
-		messageToUser = "PRIVMSG " + getNick(arg) + " :П*д*ра ответ\r\n";
+	} else if (message == "How are you?"){
+		messageToUser = "PRIVMSG " + getNick(arg) + " :Great, thx!\r\n";
 		send(this->socketFd, messageToUser.c_str(), messageToUser.length(), 0);
-	}else if (message == "a" || message == "A" || message == "а" || message == "А"){
-		messageToUser = "PRIVMSG " + getNick(arg) + " :Х*й на\r\n";
+	}else if (message == "What are you doing?"){
+		messageToUser = "PRIVMSG " + getNick(arg) + " :Making some really important computer stuff...\r\n";
 		send(this->socketFd, messageToUser.c_str(), messageToUser.length(), 0);
-	}else if (message == "Ало" || message == "ало" || message == "alo" || message == "Alo"){
-		messageToUser = "PRIVMSG " + getNick(arg) + " :х**м по лбу не дало?\r\n";
+	}else if (message == "Hi"){
+		messageToUser = "PRIVMSG " + getNick(arg) + " :Hello!\r\n";
 		send(this->socketFd, messageToUser.c_str(), messageToUser.length(), 0);
 	}
 }
